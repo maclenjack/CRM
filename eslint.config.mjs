@@ -75,5 +75,5 @@ export default typescriptEslint.config([
     files: ['**/*.md'],
     extends: [eslintMarkdown.configs.recommended],
   },
-  { ...eslintPluginPrettier, ignores: ['**/*.{md,json}'] },
+  { ...eslintPluginPrettier, ignores: ['**/*.md'] },
 ]);
