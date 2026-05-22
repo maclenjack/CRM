@@ -48,6 +48,12 @@ export default typescriptEslint.config([
         ...globals.browser,
       },
     },
+    settings: {
+      'better-tailwindcss': {
+        entryPoint: `${import.meta.dirname}/app/globals.css`,
+        lineBreakStyle: 'windows',
+      },
+    },
   },
   {
     files: ['**/*.{js,jsx,mjs,cjs}'],
