@@ -27,6 +27,8 @@ export interface DealsByStage {
   [PipelineStage.WON]?: Deal[];
 }
 
+export type DealsByStageMap = Map<PipelineStage, Deal[]>;
+
 export interface AddDealFormData {
   name: string;
   contactPerson: string;

@@ -15,7 +15,7 @@ export enum ActivityType {
 export enum Visibility {
   ALL_USERS = 'All users',
   TEAM_ONLY = 'Team only',
-  ONLY_ME = 'Only me',
+  ONLY_OWNER = 'Only owner',
 }
 
 export enum DealStatus {
@@ -31,6 +31,10 @@ export enum PipelineStage {
   PROPOSAL_MADE = 'Proposal Made',
   NEGOTIATIONS_STARTED = 'Negotiations Started',
   WON = 'Won',
+}
+
+export function isValidPipelineStage(value: string): value is PipelineStage {
+  return Object.values(PipelineStage).includes(value as PipelineStage);
 }
 
 export enum ButtonVariant {
