@@ -4,9 +4,11 @@ import { NavLink } from '@/components/NavLink';
 
 export default function DashboardPage() {
   return (
-    <div className="flex min-h-screen flex-col items-center bg-background py-12">
-      <h1 className="mb-8 text-4xl font-semibold">Welcome to CRM</h1>
-      <p className="mb-12 text-lg text-secondary">
+    <div className="flex min-h-screen flex-col items-center bg-neutral-50 py-12">
+      <h1 className="mb-8 text-4xl font-semibold text-neutral-900">
+        Welcome to CRM
+      </h1>
+      <p className="mb-12 text-lg text-neutral-600">
         Manage your contacts, activities, and deals all in one place.
       </p>
 
@@ -17,22 +19,16 @@ export default function DashboardPage() {
         "
       >
         <Card title="Contacts" subtitle="View and manage all your contacts">
-          <NavLink href="/contacts" active={false}>
-            Go to Contacts
-          </NavLink>
+          <NavLink href="/contacts">Go to Contacts</NavLink>
         </Card>
         <Card title="Activities" subtitle="Track all recent activities">
-          <NavLink href="/activities" active={false}>
-            Go to Activities
-          </NavLink>
+          <NavLink href="/activities">Go to Activities</NavLink>
         </Card>
         <Card
           title="Deals"
-          subtitle="Manage your deals with a Trello‑style board"
+          subtitle="Manage your deals with a Trello-style board"
         >
-          <NavLink href="/deals" active={false}>
-            Go to Deals
-          </NavLink>
+          <NavLink href="/deals">Go to Deals</NavLink>
         </Card>
       </div>
     </div>
