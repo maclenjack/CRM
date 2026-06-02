@@ -1,15 +1,46 @@
 # Style Guide
 
+## Overview
+
+All styles are defined in [`app/globals.css`](../app/globals.css) using Tailwind CSS v4 with the `@theme` feature for custom color properties. The theme uses a 50–950 shade system for flexible color variations. The custom colors are automatically registered as Tailwind classes, so use standard Tailwind syntax (`bg-primary-600`, `text-neutral-700`, etc.) rather than CSS variable references throughout the application.
+
 ## 1. Color Palette
 
-| Purpose | Hex | Usage |
-|---------|-----|-------|
-| Primary | #1D4ED8 | Buttons, links, active states |
-| Secondary | #64748B | Secondary actions, muted text |
-| Accent | #F59E0B | Highlights, alerts |
-| Background | #F9FAFB | Page background |
-| Surface | #FFFFFF | Card backgrounds |
-| Border | #E5E7EB | Borders, dividers |
+The color palette is defined in `globals.css` using CSS custom properties with a comprehensive shade system (50–950). Colors are organized by purpose:
+
+### Primary Colors
+Used for main interactive elements, buttons, links, and active states.
+```css
+--color-primary-50 through --color-primary-950
+```
+- `--color-primary-500`: #8b5cf6 (default)
+- `--color-primary-600`: #7c3aed (hover/active)
+- `--color-primary-700`: #6d28d9 (pressed)
+
+### Accent Colors
+Used for highlights, alerts, and secondary emphasis.
+```css
+--color-accent-50 through --color-accent-950
+```
+- `--color-accent-500`: #f59e0b (default)
+- `--color-accent-600`: #d97706 (hover/active)
+
+### Neutral Colors
+Used for backgrounds, borders, text, and neutral UI elements.
+```css
+--color-neutral-50 through --color-neutral-950
+```
+- `--color-neutral-100`: #f1f5f9 (light background)
+- `--color-neutral-500`: #64748b (muted text)
+- `--color-neutral-900`: #0f172a (dark text)
+
+### Semantic Colors
+- **Success**: `--color-success-light`, `--color-success`, `--color-success-dark`
+- **Danger**: `--color-danger-light`, `--color-danger`, `--color-danger-dark`
+- **Warning**: `--color-warning-light`, `--color-warning`, `--color-warning-dark`
+- **Info**: `--color-info-light`, `--color-info`, `--color-info-dark`
+
+Use these for status indicators, validation messages, and contextual feedback.
 
 ## 2. Typography
 
@@ -26,10 +57,18 @@
 
 ## 4. Components
 
-- **Button**: `bg-primary text-white hover:bg-primary/90`.
-- **Card**: `bg-surface shadow-md rounded-lg p-4`.
-- **Table**: `min-w-full divide-y divide-border`.
-- **Input**: `border border-border rounded-md p-2 w-full`.
+Use standard Tailwind class syntax with the custom color names. The `@theme` feature in `globals.css` automatically registers all custom color properties as Tailwind classes:
+
+- **Button**: `bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 focus:ring-primary-500`.
+- **Card**: `bg-white border border-neutral-200 rounded-lg shadow-md p-4`.
+- **Table**: `min-w-full divide-y divide-neutral-200`.
+- **Table Header**: `bg-neutral-100 text-neutral-700`.
+- **Input**: `border border-neutral-300 rounded-md p-2 w-full focus:border-primary-500 focus:ring-2 focus:ring-primary-500`.
+- **Alert Success**: `bg-success-light text-success-dark border-l-4 border-success`.
+- **Alert Danger**: `bg-danger-light text-danger-dark border-l-4 border-danger`.
+- **Alert Warning**: `bg-warning-light text-warning-dark border-l-4 border-warning`.
+
+**Use `bg-primary-600` instead of `bg-[var(--color-primary-600)]`.** The bracket syntax is only needed when referencing custom properties in non-Tailwind contexts.
 
 ## 5. Accessibility
 
