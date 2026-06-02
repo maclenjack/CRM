@@ -12,34 +12,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div
-      className="
-        flex min-h-screen items-center justify-center bg-gray-50
-        dark:bg-gray-900
-      "
-    >
+    <div className="flex min-h-screen items-center justify-center bg-neutral-50">
       <form
         onSubmit={handleSubmit}
         className="
-          w-full max-w-sm space-y-4 rounded-lg bg-white p-8 shadow-md
-          dark:bg-gray-800
+          w-full max-w-sm space-y-4 rounded-lg border border-neutral-200
+          bg-white p-8 shadow-md
         "
       >
-        <h2
-          className="
-            text-center text-2xl font-semibold text-gray-900
-            dark:text-white
-          "
-        >
+        <h2 className="text-center text-2xl font-semibold text-neutral-900">
           Login
         </h2>
         <div>
           <label
             htmlFor="username"
-            className="
-              block text-sm font-medium text-gray-700
-              dark:text-gray-300
-            "
+            className="block text-sm font-medium text-neutral-700"
           >
             Username
           </label>
@@ -49,20 +36,16 @@ export default function LoginPage() {
             name="username"
             required
             className="
-              mt-1 block w-full rounded-md border-gray-300 bg-white px-3 py-2
-              text-gray-900 shadow-sm
-              focus:border-indigo-500 focus:ring-indigo-500
-              dark:border-gray-700 dark:bg-gray-700 dark:text-gray-200
+              mt-1 block w-full rounded-md border border-neutral-300 bg-white
+              px-3 py-2 text-neutral-900 shadow-sm
+              focus:border-primary-500 focus:ring-primary-500
             "
           />
         </div>
         <div>
           <label
             htmlFor="password"
-            className="
-              block text-sm font-medium text-gray-700
-              dark:text-gray-300
-            "
+            className="block text-sm font-medium text-neutral-700"
           >
             Password
           </label>
@@ -72,18 +55,17 @@ export default function LoginPage() {
             name="password"
             required
             className="
-              mt-1 block w-full rounded-md border-gray-300 bg-white px-3 py-2
-              text-gray-900 shadow-sm
-              focus:border-indigo-500 focus:ring-indigo-500
-              dark:border-gray-700 dark:bg-gray-700 dark:text-gray-200
+              mt-1 block w-full rounded-md border border-neutral-300 bg-white
+              px-3 py-2 text-neutral-900 shadow-sm
+              focus:border-primary-500 focus:ring-primary-500
             "
           />
         </div>
         <button
           type="submit"
           className="
-            w-full rounded-md bg-indigo-600 py-2 text-white
-            hover:bg-indigo-700
+            w-full rounded-md bg-primary-600 py-2 text-white
+            hover:bg-primary-700
           "
         >
           Sign in

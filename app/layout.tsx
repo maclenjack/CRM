@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
+import { InfoBanner } from '@/components/InfoBanner';
+
 import './globals.css';
 
 const geistSans = Geist({
@@ -32,7 +34,12 @@ export default function RootLayout({
         h-full antialiased
       `}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        <InfoBanner className="m-0!">
+          This is a mockup. No data is loaded.
+        </InfoBanner>
+        {children}
+      </body>
     </html>
   );
 }
