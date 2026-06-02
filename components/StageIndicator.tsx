@@ -17,7 +17,7 @@ export function StageIndicator({
           <div
             className={clsx(
               'size-4 rounded-full',
-              i <= index ? 'bg-primary' : 'border border-border'
+              i <= index ? 'bg-primary-600' : 'border border-neutral-300'
             )}
           />
           {i < stages.length - 1 && <span className="mx-1">→</span>}

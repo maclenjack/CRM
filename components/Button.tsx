@@ -7,11 +7,11 @@ import { ButtonSize, ButtonVariant } from '@/types';
 function getVariantClass(variant: ButtonVariant): string {
   switch (variant) {
     case ButtonVariant.PRIMARY:
-      return 'bg-primary text-white hover:bg-primary/90 focus:ring-primary';
+      return 'bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 focus:ring-primary-500';
     case ButtonVariant.SECONDARY:
-      return 'bg-secondary text-white hover:bg-secondary/90 focus:ring-secondary';
+      return 'bg-neutral-600 text-white hover:bg-neutral-700 active:bg-neutral-800 focus:ring-neutral-500';
     case ButtonVariant.ACCENT:
-      return 'bg-accent text-white hover:bg-accent/90 focus:ring-accent';
+      return 'bg-accent-600 text-white hover:bg-accent-700 active:bg-accent-800 focus:ring-accent-500';
   }
 }
 

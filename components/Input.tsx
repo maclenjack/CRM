@@ -21,7 +21,7 @@ export function Input({
 }: InputProps) {
   return (
     <div className="flex flex-col space-y-1">
-      <label className="text-sm font-medium text-secondary">{label}</label>
+      <label className="text-sm font-medium text-neutral-700">{label}</label>
       <input
         type={type}
         value={value}
@@ -30,8 +30,8 @@ export function Input({
         required={required}
         className={clsx(
           `
-            rounded-md border border-border p-2
-            focus:ring-2 focus:ring-primary focus:outline-none
+            rounded-md border border-neutral-300 p-2
+            focus:ring-2 focus:ring-primary-500 focus:outline-none
           `,
           className
         )}

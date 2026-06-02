@@ -12,11 +12,11 @@ export interface PriorityBadgeProps {
 function getPriorityClass(priority: PriorityLevel): string {
   switch (priority) {
     case PriorityLevel.HIGH:
-      return 'bg-red-500 text-white';
+      return 'bg-danger text-white';
     case PriorityLevel.MEDIUM:
-      return 'bg-yellow-500 text-white';
+      return 'bg-warning text-white';
     case PriorityLevel.LOW:
-      return 'bg-blue-500 text-white';
+      return 'bg-info text-white';
   }
 }
 
