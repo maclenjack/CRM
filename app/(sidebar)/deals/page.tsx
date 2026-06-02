@@ -377,10 +377,7 @@ export default function DealsPage() {
           </div>
           <Button onClick={() => setModalOpen(true)}>+ Deal</Button>
         </div>
-        <KanbanBoard
-          dealsByStage={dealsByStageMap}
-          onDealMove={handleDealMove}
-        />
+        <KanbanBoard dealsByStage={dealsByStageMap} />
         <AddDealModal
           isOpen={isModalOpen}
           onClose={() => setModalOpen(false)}
