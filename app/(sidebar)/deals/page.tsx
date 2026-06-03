@@ -4,13 +4,8 @@ import { useState } from 'react';
 import { AddDealModal } from '@/components/AddDealModal';
 import { Button } from '@/components/Button';
 import { KanbanBoard } from '@/components/KanbanBoard';
-import {
-  Deal,
-  DealsByStage,
-  PipelineStage,
-  PriorityLevel,
-  Visibility,
-} from '@/types';
+import { PriorityLevel } from '@/models';
+import { Deal, DealsByStage, PipelineStage, Visibility } from '@/types';
 
 const mockDeals: DealsByStage = {
   [PipelineStage.QUALIFIED]: [
@@ -317,32 +312,13 @@ const mockDeals: DealsByStage = {
 
 export default function DealsPage() {
   const [isModalOpen, setModalOpen] = useState(false);
-  const [dealsByStage, setDealsByStage] = useState<DealsByStage>(mockDeals);
+  const [dealsByStage] = useState<DealsByStage>(mockDeals);
 
   // Calculate total deal count
   const totalDeals = Object.values(dealsByStage).reduce(
     (sum, dealsInStage) => sum + (dealsInStage?.length || 0),
     0
   );
-
-  const handleDealMove = (dealId: string, newStage: PipelineStage) => {
-    console.log(`Moving deal ${dealId} to stage ${newStage}`);
-    setDealsByStage((prev) => {
-      const newState: DealsByStage = { ...prev };
-      // Find the deal and update its stage
-      for (const stageKey of Object.values(PipelineStage)) {
-        const stageDeals = newState[stageKey as PipelineStage] || [];
-        const index = stageDeals.findIndex((d) => d.id === dealId);
-        if (index !== -1) {
-          const [movedDeal] = stageDeals.splice(index, 1);
-          movedDeal.stage = newStage;
-          newState[newStage] = [...(newState[newStage] || []), movedDeal];
-          break;
-        }
-      }
-      return newState;
-    });
-  };
 
   const dealsByStageMap = new Map<PipelineStage, Deal[]>([
     [PipelineStage.QUALIFIED, dealsByStage[PipelineStage.QUALIFIED] || []],

@@ -1,7 +1,8 @@
-'use client';
-import { ActivityTable } from '@/components/ActivityTable';
-import ModalButton from '@/components/ModalButton';
-import { ScheduleActivityModal } from '@/components/ScheduleActivityModal';
+import {
+  ActivityTable,
+  ModalButton,
+  ScheduleActivityModal,
+} from '@/components';
 
 export default function ActivitiesPage() {
   return (

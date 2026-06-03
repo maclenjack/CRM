@@ -1,6 +1,4 @@
-// app/dashboard/page.tsx
-import { Card } from '@/components/Card';
-import { NavLink } from '@/components/NavLink';
+import { Card, NavLink } from '@/components';
 
 export default function DashboardPage() {
   return (

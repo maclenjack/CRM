@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { ContactsSidebar } from '@/components/ContactsSidebar';
+import { ContactsSidebar } from '@/components';
 
 export default function ContactsLayout({ children }: { children: ReactNode }) {
   return (
