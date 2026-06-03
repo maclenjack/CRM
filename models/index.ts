@@ -5,5 +5,4 @@
 export * from './ButtonSize';
 export * from './ButtonVariant';
 export * from './DefaultEnum';
-export * from './PipelineStage';
 export * from './PriorityLevel';
