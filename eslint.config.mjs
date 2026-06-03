@@ -53,6 +53,12 @@ export default typescriptEslint.config([
         entryPoint: `${import.meta.dirname}/app/globals.css`,
       },
     },
+    rules: {
+      'better-tailwindcss/enforce-consistent-line-wrapping': [
+        'error',
+        { strictness: 'loose' },
+      ],
+    },
   },
   {
     files: ['**/*.{js,jsx,mjs,cjs}'],
