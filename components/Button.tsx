@@ -2,31 +2,9 @@ import { ReactNode } from 'react';
 
 import clsx from 'clsx';
 
-import { ButtonSize, ButtonVariant } from '@/types';
+import { ButtonSize, ButtonVariant } from '@/models';
 
-function getVariantClass(variant: ButtonVariant): string {
-  switch (variant) {
-    case ButtonVariant.PRIMARY:
-      return 'bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 focus:ring-primary-500';
-    case ButtonVariant.SECONDARY:
-      return 'bg-neutral-600 text-white hover:bg-neutral-700 active:bg-neutral-800 focus:ring-neutral-500';
-    case ButtonVariant.ACCENT:
-      return 'bg-accent-600 text-white hover:bg-accent-700 active:bg-accent-800 focus:ring-accent-500';
-  }
-}
-
-function getSizeClass(size: ButtonSize): string {
-  switch (size) {
-    case ButtonSize.SMALL:
-      return 'px-3 py-1.5 text-sm';
-    case ButtonSize.MEDIUM:
-      return 'px-4 py-2 text-base';
-    case ButtonSize.LARGE:
-      return 'px-5 py-3 text-lg';
-  }
-}
-
-export interface ButtonProps {
+interface ButtonProps {
   children: ReactNode;
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
@@ -50,8 +28,8 @@ export function Button({
       type={type}
       className={clsx(
         base,
-        getVariantClass(variant),
-        getSizeClass(size),
+        variant.className,
+        size.className,
         disabled ? 'cursor-not-allowed opacity-50' : ''
       )}
       onClick={onClick}

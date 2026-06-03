@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useDroppable } from '@dnd-kit/core';
 
-export default function KanbanBoardStage({
+export function KanbanBoardStage({
   id,
   title,
   children,

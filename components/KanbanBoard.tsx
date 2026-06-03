@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import {
   DndContext,
@@ -16,9 +16,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 
-import DealCard from '@/components/DealCard';
-import { DealCardOverlay } from '@/components/DealCardOverlay';
-import KanbanBoardStage from '@/components/KanbanBoardStage';
+import { DealCard, DealCardOverlay, KanbanBoardStage } from '@/components';
 import {
   Deal,
   DealsByStageMap,

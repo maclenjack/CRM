@@ -5,7 +5,7 @@ import {
   UserIcon,
 } from '@heroicons/react/24/outline';
 
-import { NavLink } from '@/components/NavLink';
+import { NavLink } from '@/components';
 
 export function Sidebar() {
   return (

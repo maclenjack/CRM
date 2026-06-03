@@ -1,16 +1,15 @@
-import { Button } from '@/components/Button';
-import { Card } from '@/components/Card';
-import { Input } from '@/components/Input';
-import { PriorityBadge } from '@/components/PriorityBadge';
-import { ButtonVariant, PriorityLevel } from '@/types/enums';
+import { Button, Card, Input, PriorityBadge } from '@/components';
+import { ButtonVariant, PriorityLevel } from '@/models';
+
+interface ScheduleActivityModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
 
 export function ScheduleActivityModal({
   isOpen,
   onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
+}: ScheduleActivityModalProps) {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50">

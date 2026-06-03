@@ -1,10 +1,9 @@
 import { ReactNode } from 'react';
 
-import { Table, TableColumn } from '@/components/Table';
-import { Visibility } from '@/types/enums';
-import { Person } from '@/types/person';
+import { Table } from '@/components';
+import { Person, TableColumn, Visibility } from '@/types';
 
-export interface PeopleTableProps {
+interface PeopleTableProps {
   children?: ReactNode;
 }
 

@@ -1,15 +1,13 @@
-'use client';
 import { useState } from 'react';
 
-import { Button } from '@/components/Button';
+import { Button } from '@/components';
 
-export default function ModalButton({
-  Modal,
-  children,
-}: {
+interface ModalButtonProps {
   Modal: React.ComponentType<{ isOpen: boolean; onClose: () => void }>;
   children: React.ReactNode;
-}) {
+}
+
+export function ModalButton({ Modal, children }: ModalButtonProps) {
   const [isModalOpen, setModalOpen] = useState(false);
   return (
     <>

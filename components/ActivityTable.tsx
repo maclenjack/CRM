@@ -1,42 +1,32 @@
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 
-import { Table } from '@/components/Table';
-import { PriorityLevel } from '@/types';
+import { Table } from '@/components';
+import { PriorityLevel } from '@/models';
+import { Activity, ActivityType } from '@/types';
 
-export interface Activity {
-  id: number;
-  done: boolean;
-  subject: string;
-  deal: string;
-  priority: PriorityLevel;
-  contact: string;
-  email: string;
-  phone: string;
-  organization: string;
-  dueDate: string;
-}
-
-export const mockActivities: Activity[] = [
+const mockActivities: Activity[] = [
   {
-    id: 1,
-    done: false,
+    id: '1',
     subject: 'Follow up on proposal',
+    type: ActivityType.CALL,
+    done: false,
     deal: 'Deal #123',
     priority: PriorityLevel.HIGH,
-    contact: 'Alice Smith',
+    contactPerson: 'Alice Smith',
     email: 'alice@example.com',
     phone: '+1 555 1234',
     organization: 'Acme Corp',
     dueDate: '2026-05-30',
   },
   {
-    id: 2,
+    id: '2',
+    type: ActivityType.MEETING,
     done: true,
     subject: 'Schedule demo',
     deal: 'Deal #456',
     priority: PriorityLevel.MEDIUM,
-    contact: 'Bob Johnson',
+    contactPerson: 'Bob Johnson',
     email: 'bob@example.com',
     phone: '+1 555 5678',
     organization: 'Beta Ltd',
@@ -83,7 +73,7 @@ export function ActivityTable() {
     { header: 'Subject', accessor: 'subject', sortable: true },
     { header: 'Deal', accessor: 'deal', sortable: true },
     { header: 'Priority', accessor: 'priority', sortable: true },
-    { header: 'Contact', accessor: 'contact', sortable: true },
+    { header: 'Contact', accessor: 'contactPerson', sortable: true },
     { header: 'Email', accessor: 'email', sortable: true },
     { header: 'Phone', accessor: 'phone', sortable: true },
     { header: 'Organization', accessor: 'organization', sortable: true },

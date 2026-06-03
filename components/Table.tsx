@@ -3,15 +3,9 @@ import { useMemo, useState } from 'react';
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
 
-export interface TableColumn<T> {
-  header: string;
-  accessor: keyof T;
-  className?: string;
-  formatter?: (value: T[keyof T], row: T) => React.ReactNode;
-  sortable?: boolean;
-}
+import { TableColumn } from '@/types';
 
-export interface TableProps<T> {
+interface TableProps<T> {
   columns: Array<TableColumn<T>>;
   data: T[];
   className?: string;

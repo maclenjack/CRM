@@ -1,12 +1,11 @@
-'use client';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
 
-import { PriorityBadge } from '@/components/PriorityBadge';
+import { PriorityBadge } from '@/components';
 import { Deal } from '@/types';
 
-export default function DealCard({ deal }: { deal: Deal }) {
+export function DealCard({ deal }: { deal: Deal }) {
   const {
     attributes,
     listeners,

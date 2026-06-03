@@ -1,4 +1,4 @@
-import { PriorityBadge } from '@/components/PriorityBadge';
+import { PriorityBadge } from '@/components';
 import { Deal } from '@/types';
 
 export function DealCardOverlay({
