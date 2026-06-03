@@ -1,4 +1,6 @@
-import { PipelineStage, PriorityLevel, Visibility } from './enums';
+import { PriorityLevel } from '@/models';
+
+import { PipelineStage, Visibility } from './enums';
 
 export interface Deal {
   id: string;
@@ -19,12 +21,12 @@ export interface Deal {
 }
 
 export interface DealsByStage {
-  [PipelineStage.QUALIFIED]?: Deal[];
-  [PipelineStage.CONTACT_MADE]?: Deal[];
-  [PipelineStage.DEMO_SCHEDULED]?: Deal[];
-  [PipelineStage.PROPOSAL_MADE]?: Deal[];
-  [PipelineStage.NEGOTIATIONS_STARTED]?: Deal[];
-  [PipelineStage.WON]?: Deal[];
+  [PipelineStage.QUALIFIED]: Deal[];
+  [PipelineStage.CONTACT_MADE]: Deal[];
+  [PipelineStage.DEMO_SCHEDULED]: Deal[];
+  [PipelineStage.PROPOSAL_MADE]: Deal[];
+  [PipelineStage.NEGOTIATIONS_STARTED]: Deal[];
+  [PipelineStage.WON]: Deal[];
 }
 
 export type DealsByStageMap = Map<PipelineStage, Deal[]>;

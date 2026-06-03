@@ -36,15 +36,3 @@ export enum PipelineStage {
 export function isValidPipelineStage(value: string): value is PipelineStage {
   return Object.values(PipelineStage).includes(value as PipelineStage);
 }
-
-export enum ButtonVariant {
-  PRIMARY = 'Primary',
-  SECONDARY = 'Secondary',
-  ACCENT = 'Accent',
-}
-
-export enum ButtonSize {
-  SMALL = 'Small',
-  MEDIUM = 'Medium',
-  LARGE = 'Large',
-}

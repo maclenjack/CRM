@@ -1,4 +1,6 @@
-import { ActivityType, PriorityLevel } from './enums';
+import { PriorityLevel } from '@/models';
+
+import { ActivityType } from './enums';
 
 export interface Activity {
   id: string;
@@ -14,7 +16,6 @@ export interface Activity {
   dueDate: string;
   description?: string;
   location?: string;
-  owner: string;
 }
 
 export interface ScheduleActivityFormData {
