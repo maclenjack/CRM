@@ -25,6 +25,24 @@ rules enforce a linear history, require reviews, and protect the `main` and
 `staging` branches. All changes should be made on feature branches following
 the naming convention described in `branching.md`.
 
+### Import Conventions
+
+* Prefer importing from the `index.ts` of a directory when possible. For
+	example, instead of
+
+	```ts
+	import { Button } from "@/components/Button";
+	```
+
+	use
+
+	```ts
+	import { Button } from "@/components";
+	```
+
+	This keeps import paths short and makes it easier to refactor
+	component locations without touching many files.
+
 ## Branching and Commit Strategy
 
 All work should be performed on feature branches that follow the naming convention described in

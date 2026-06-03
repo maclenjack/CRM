@@ -1,0 +1,15 @@
+{
+  "directory": [
+    "./components",
+    "./models",
+    "./types"
+  ],
+  "delete": true,
+  "exclude": [
+    "cache-life.d.ts",
+    "routes.d.ts",
+    "validator.ts"
+  ],
+  "location": "top",
+  "singleQuotes": true
+}

@@ -31,7 +31,7 @@ export default typescriptEslint.config([
     files: ['**/*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}'],
     extends: [
       ...eslintConfigNextCoreWebVitals,
-      eslintPluginBetterTailwindcss.configs.recommended,
+      eslintPluginBetterTailwindcss.configs['recommended-error'],
       esLintPluginCompat.configs['flat/recommended'],
       eslintPluginReact.configs.flat['jsx-runtime'],
       eslintPluginSecurity.configs.recommended,
@@ -47,6 +47,17 @@ export default typescriptEslint.config([
       globals: {
         ...globals.browser,
       },
+    },
+    settings: {
+      'better-tailwindcss': {
+        entryPoint: `${import.meta.dirname}/app/globals.css`,
+      },
+    },
+    rules: {
+      'better-tailwindcss/enforce-consistent-line-wrapping': [
+        'error',
+        { strictness: 'loose' },
+      ],
     },
   },
   {
