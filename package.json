@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "lint:fix": "eslint --fix"
+    "lint:fix": "eslint --fix",
+    "generate-barrels": "node build-barrels.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -34,6 +35,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.5.0",
+    "barrelsby": "^2.8.1",
     "eslint": "^10.4.0",
     "eslint-config-next": "^16.2.6",
     "eslint-import-resolver-typescript": "^4.4.4",
