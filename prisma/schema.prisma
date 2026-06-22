@@ -1,0 +1,377 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+generator zod {
+  provider = "zod-prisma-types"
+  output = "../generated/zod"
+  createInputTypes = true 
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+// TODO: (OPTIONAL) Custom activity types. For now we can hardcode a default set of common activity types.
+enum ActivityType {
+  CALL
+  MEETING
+  TASK
+  DEADLINE
+  EMAIL
+  LUNCH
+}
+
+enum PriorityLevel {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum DealStatus {
+  OPEN
+  WON
+  LOST
+}
+
+// TODO: (OPTIONAL) Custom pipelines and pipeline stages. For now we can hardcode a default pipeline with fixed stages.
+enum PipelineStage {
+  QUALIFIED
+  CONTACT_MADE
+  DEMO_SCHEDULED
+  PROPOSAL_MADE
+  NEGOTIATIONS_STARTED
+  WON
+}
+
+enum ContactCategory {
+  WORK
+  PERSONAL
+  OTHER
+}
+
+// TODO: (OPTIONAL) Location management.
+// TODO: (OPTIONAL) Teams/Organisations and team-based/organisation-based permissions.
+
+// ============================================================================
+// AUTHENTICATION (NextAuth)
+// ============================================================================
+
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String?   @unique
+  emailVerified  DateTime? @map("email_verified")
+  image          String?
+  hashedPassword String?
+  role           String    @default("user")
+
+  accounts             Account[]
+  sessions             Session[]
+  ownedOrganizations   Organization[] @relation("organizationOwner")
+  ownedPeople          Person[]       @relation("personOwner")
+  ownedDeals           Deal[]         @relation("dealOwner")
+  ownedActivities      Activity[]     @relation("activityOwner")
+  createdActivities    Activity[]     @relation("activityCreatedBy")
+  updatedActivities    Activity[]     @relation("activityUpdatedBy")
+  createdDeals         Deal[]         @relation("dealCreatedBy")
+  updatedDeals         Deal[]         @relation("dealUpdatedBy")
+  createdPeople        Person[]       @relation("personCreatedBy")
+  updatedPeople        Person[]       @relation("personUpdatedBy")
+  createdOrganizations Organization[] @relation("organizationCreatedBy")
+  updatedOrganizations Organization[] @relation("organizationUpdatedBy")
+  createdNotes         Note[]         @relation("noteCreatedBy")
+  updatedNotes         Note[]         @relation("noteUpdatedBy")
+  createdLabels        Label[]        @relation("labelCreatedBy")
+  updatedLabels        Label[]        @relation("labelUpdatedBy")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ============================================================================
+// BUSINESS MODELS
+// ============================================================================
+
+model Organization {
+  id      String @id @default(cuid())
+  name    String
+  owner   User   @relation("organizationOwner", fields: [ownerId], references: [id])
+  ownerId String @map("owner_id")
+
+  // TODO: (Optional) Add address.
+  people     Person[]
+  deals      Deal[]
+  activities Activity[]
+  notes      Note[]
+  labels     Label[]    @relation("OrganizationLabels")
+
+  createdBy   User    @relation("organizationCreatedBy", fields: [createdById], references: [id])
+  createdById String  @map("created_by_id")
+  updatedBy   User?   @relation("organizationUpdatedBy", fields: [updatedById], references: [id])
+  updatedById String? @map("updated_by_id")
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([ownerId])
+  @@index([createdAt])
+  @@index([deletedAt])
+  @@map("organizations")
+}
+
+model Note {
+  id      String @id @default(cuid())
+  content String @db.Text
+
+  deal           Deal?         @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  dealId         String?       @map("deal_id")
+  activity       Activity?     @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  activityId     String?       @map("activity_id")
+  person         Person?       @relation(fields: [personId], references: [id], onDelete: Cascade)
+  personId       String?       @map("person_id")
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String?       @map("organization_id")
+
+  createdBy   User    @relation("noteCreatedBy", fields: [createdById], references: [id])
+  createdById String  @map("created_by_id")
+  updatedBy   User?   @relation("noteUpdatedBy", fields: [updatedById], references: [id])
+  updatedById String? @map("updated_by_id")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([dealId])
+  @@index([activityId])
+  @@index([personId])
+  @@index([organizationId])
+  @@map("notes")
+}
+
+model Label {
+  id   String @id @default(cuid())
+  name String @unique
+
+  people        Person[]       @relation("PersonLabels")
+  deals         Deal[]         @relation("DealLabels")
+  organizations Organization[] @relation("OrganizationLabels")
+
+  createdBy   User    @relation("labelCreatedBy", fields: [createdById], references: [id])
+  createdById String  @map("created_by_id")
+  updatedBy   User?   @relation("labelUpdatedBy", fields: [updatedById], references: [id])
+  updatedById String? @map("updated_by_id")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+  @@map("labels")
+}
+
+model Person {
+  id             String       @id @default(cuid())
+  name           String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String       @map("organization_id")
+
+  owner   User   @relation("personOwner", fields: [ownerId], references: [id])
+  ownerId String @map("owner_id")
+
+  notes  Note[]
+  labels Label[] @relation("PersonLabels")
+
+  emails PersonEmail[]
+  phones PersonPhone[]
+
+  deals      Deal[]
+  activities Activity[]
+
+  createdBy   User    @relation("personCreatedBy", fields: [createdById], references: [id])
+  createdById String  @map("created_by_id")
+  updatedBy   User?   @relation("personUpdatedBy", fields: [updatedById], references: [id])
+  updatedById String? @map("updated_by_id")
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([organizationId])
+  @@index([ownerId])
+  @@index([createdAt])
+  @@index([deletedAt])
+  @@map("people")
+}
+
+model PersonEmail {
+  id       String          @id @default(cuid())
+  email    String
+  category ContactCategory @default(WORK)
+  person   Person          @relation(fields: [personId], references: [id], onDelete: Cascade)
+  personId String          @map("person_id")
+
+  @@unique([personId, email])
+  @@index([email])
+  @@map("person_emails")
+}
+
+model PersonPhone {
+  id       String          @id @default(cuid())
+  phone    String
+  category ContactCategory @default(WORK)
+  person   Person          @relation(fields: [personId], references: [id], onDelete: Cascade)
+  personId String          @map("person_id")
+
+  @@unique([personId, phone])
+  @@index([phone])
+  @@map("person_phones")
+}
+
+model Deal {
+  id                String        @id @default(cuid())
+  title             String
+  value             Float         @default(0)
+  currency          String        @default("NZD")
+  stage             PipelineStage @default(QUALIFIED)
+  status            DealStatus    @default(OPEN)
+  priority          PriorityLevel @default(MEDIUM)
+  notes             Note[]
+  labels            Label[]       @relation("DealLabels")
+  expectedCloseDate DateTime?
+  lostReason        String?
+  lastActivityDate  DateTime?
+  nextActivityDate  DateTime?
+  wonAt             DateTime?
+  lostAt            DateTime?
+
+  owner   User   @relation("dealOwner", fields: [ownerId], references: [id])
+  ownerId String @map("owner_id")
+
+  contactPerson Person @relation(fields: [personId], references: [id], onDelete: Restrict)
+  personId      String @map("person_id")
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String       @map("organization_id")
+
+  products String[] @default([])
+
+  activities Activity[]
+
+  createdBy   User    @relation("dealCreatedBy", fields: [createdById], references: [id])
+  createdById String  @map("created_by_id")
+  updatedBy   User?   @relation("dealUpdatedBy", fields: [updatedById], references: [id])
+  updatedById String? @map("updated_by_id")
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([personId])
+  @@index([organizationId])
+  @@index([ownerId])
+  @@index([stage])
+  @@index([status])
+  @@index([wonAt])
+  @@index([lostAt])
+  @@index([expectedCloseDate])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([deletedAt])
+  @@map("deals")
+}
+
+model Activity {
+  id          String        @id @default(cuid())
+  subject     String
+  type        ActivityType  @default(TASK)
+  done        Boolean       @default(false)
+  priority    PriorityLevel @default(MEDIUM)
+  startDate   DateTime
+  endDate     DateTime
+  description String?       @db.Text
+  location    String?
+
+  owner   User   @relation("activityOwner", fields: [ownerId], references: [id])
+  ownerId String @map("owner_id")
+
+  deal   Deal?   @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  dealId String? @map("deal_id")
+
+  contactPerson Person? @relation(fields: [personId], references: [id], onDelete: SetNull)
+  personId      String? @map("person_id")
+
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  organizationId String?       @map("organization_id")
+
+  notes Note[]
+
+  createdBy   User    @relation("activityCreatedBy", fields: [createdById], references: [id])
+  createdById String  @map("created_by_id")
+  updatedBy   User?   @relation("activityUpdatedBy", fields: [updatedById], references: [id])
+  updatedById String? @map("updated_by_id")
+
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([dealId])
+  @@index([personId])
+  @@index([ownerId])
+  @@index([organizationId])
+  @@index([type])
+  @@index([startDate])
+  @@index([endDate])
+  @@index([done])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([deletedAt])
+  @@map("activities")
+}
