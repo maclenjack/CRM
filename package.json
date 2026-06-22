@@ -8,17 +8,31 @@
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "generate-barrels": "node build-barrels.js"
+    "generate-barrels": "node build-barrels.js",
+    "db:format": "prisma format",
+    "db:reset": "prisma migrate reset --force",
+    "db:seed": "prisma db seed",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "prisma:deploy": "prisma migrate deploy"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@heroicons/react": "^2.2.0",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "clsx": "^2.1.1",
+    "dotenv": "^17.4.2",
     "next": "16.2.6",
     "react": "19.2.6",
-    "react-dom": "19.2.6"
+    "react-dom": "19.2.6",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -54,9 +68,11 @@
     "jest": "^30.4.2",
     "postcss": "^8.5.14",
     "prettier": "^3.8.3",
+    "prisma": "^7.8.0",
     "tailwindcss": "^4.3.0",
     "ts-jest": "^29.4.9",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.3"
+    "typescript-eslint": "^8.59.3",
+    "zod-prisma-types": "^3.3.11"
   }
 }
