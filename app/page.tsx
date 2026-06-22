@@ -6,7 +6,7 @@ export default async function Page() {
   const session = await auth();
 
   if (!session) {
-    return redirect('/login');
+    return redirect('/sign_in');
   }
 
   return redirect('/dashboard');

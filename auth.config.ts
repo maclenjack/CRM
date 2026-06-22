@@ -2,8 +2,8 @@ import type { NextAuthConfig } from 'next-auth';
 
 export const authConfig: NextAuthConfig = {
   pages: {
-    signIn: '/login',
-    error: '/login',
+    signIn: '/sign_in',
+    error: '/sign_in',
   },
   secret: process.env.NEXTAUTH_SECRET,
   cookies: {
@@ -25,10 +25,10 @@ export const authConfig: NextAuthConfig = {
       console.log(auth);
       const isLoggedIn = !!auth?.user;
       const isPublicRoute =
-        nextUrl.pathname === '/login' || nextUrl.pathname === '/register';
+        nextUrl.pathname === '/sign_in' || nextUrl.pathname === '/register';
 
       if (!isLoggedIn && !isPublicRoute) {
-        return Response.redirect(new URL('/login', nextUrl));
+        return Response.redirect(new URL('/sign_in', nextUrl));
       }
 
       if (isLoggedIn && isPublicRoute) {
