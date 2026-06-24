@@ -1,8 +1,12 @@
+import { auth } from '@/auth';
 import { ActivityTable } from '@/components/ActivityTable';
 import { ModalButton } from '@/components/ModalButton';
 import { ScheduleActivityModal } from '@/components/ScheduleActivityModal';
 
-export default function ActivitiesPage() {
+export default async function ActivitiesPage() {
+  const session = await auth();
+  if (!session?.user) return null;
+
   return (
     <div className="flex min-h-screen">
       <div className="flex-1 p-8">
