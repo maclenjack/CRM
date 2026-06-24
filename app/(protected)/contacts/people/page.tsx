@@ -1,4 +1,6 @@
-import { AddPersonModal, ModalButton, PeopleTable } from '@/components';
+import { AddPersonModal } from '@/components/AddPersonModal';
+import { ModalButton } from '@/components/ModalButton';
+import { PeopleTable } from '@/components/PeopleTable';
 
 export default function PeoplePage() {
   return (

@@ -1,4 +1,8 @@
-import { Button, Card, Input } from '@/components';
+'use client';
+
+import { Button } from '@/components/Button';
+import { Card } from '@/components/Card';
+import { Input } from '@/components/Input';
 import { ButtonVariant } from '@/models';
 
 export function AddPersonModal({

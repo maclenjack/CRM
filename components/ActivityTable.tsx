@@ -1,7 +1,9 @@
+'use client';
+
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 
-import { Table } from '@/components';
+import { Table } from '@/components/Table';
 import { PriorityLevel } from '@/models';
 import { Activity, ActivityType } from '@/types';
 

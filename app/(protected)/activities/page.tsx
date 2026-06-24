@@ -1,8 +1,6 @@
-import {
-  ActivityTable,
-  ModalButton,
-  ScheduleActivityModal,
-} from '@/components';
+import { ActivityTable } from '@/components/ActivityTable';
+import { ModalButton } from '@/components/ModalButton';
+import { ScheduleActivityModal } from '@/components/ScheduleActivityModal';
 
 export default function ActivitiesPage() {
   return (

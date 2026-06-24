@@ -1,3 +1,5 @@
+'use client';
+
 import { useMemo, useState } from 'react';
 
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/outline';

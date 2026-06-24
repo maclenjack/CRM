@@ -1,4 +1,5 @@
-import { Card, NavLink } from '@/components';
+import { Card } from '@/components/Card';
+import { NavLink } from '@/components/NavLink';
 
 export default function DashboardPage() {
   return (

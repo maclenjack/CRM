@@ -1,3 +1,5 @@
+'use client';
+
 import { usePathname } from 'next/dist/client/components/navigation';
 import Link from 'next/link';
 import { ReactNode } from 'react';

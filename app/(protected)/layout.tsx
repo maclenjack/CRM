@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { Sidebar } from '@/components';
+import { Sidebar } from '@/components/Sidebar';
 
 export default function SidebarLayout({ children }: { children: ReactNode }) {
   return (

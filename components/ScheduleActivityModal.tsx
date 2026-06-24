@@ -1,4 +1,9 @@
-import { Button, Card, Input, PriorityBadge } from '@/components';
+'use client';
+
+import { Button } from '@/components/Button';
+import { Card } from '@/components/Card';
+import { Input } from '@/components/Input';
+import { PriorityBadge } from '@/components/PriorityBadge';
 import { ButtonVariant, PriorityLevel } from '@/models';
 
 interface ScheduleActivityModalProps {
