@@ -1,7 +1,9 @@
+import { SignInForm } from '@/components/SignInForm';
+
 export default function SignInPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-50">
-      Sign In AddDealFormData Placeholder
+      <SignInForm />
     </div>
   );
 }
