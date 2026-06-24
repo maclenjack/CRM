@@ -35,7 +35,6 @@ export function ContactsButton() {
         </span>
         <CollapsibleTrigger
           onClick={(e) => {
-            // ⚠️ THE FIX: Prevents the Link from routing and intercepting the click
             e.preventDefault();
             e.stopPropagation();
             setOpen((prev) => !prev);
