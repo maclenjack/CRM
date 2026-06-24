@@ -162,7 +162,7 @@ export function RegisterForm() {
             <ItemActions>
               <Button variant="link">
                 <Link
-                  href="/sign_in"
+                  href="/sign-in"
                   className="
                     text-primary-600
                     hover:underline
