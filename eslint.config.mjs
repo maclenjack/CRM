@@ -25,6 +25,8 @@ export default typescriptEslint.config([
       'types/cache-life.d.ts',
       'types/routes.d.ts',
       'types/validator.ts',
+      'generated/**',
+      'prisma/**',
     ],
   },
   {
