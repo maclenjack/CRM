@@ -1,141 +1,180 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useTransition } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 
-import { devLog } from '@/utils/logger';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import z from 'zod';
+
+import { registerUser } from '@/app/actions/register';
+import { PasswordField } from '@/components/PasswordField';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+} from '@/components/ui/item';
+import { Separator } from '@/components/ui/separator';
+import { registerSchema } from '@/schemas/user.schema';
 
 export function RegisterForm() {
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
+  const form = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
+    mode: 'onTouched',
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
+  });
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    const formData = new FormData(e.currentTarget);
-    const name = formData.get('name');
-    const email = formData.get('email');
-    const password = formData.get('password');
-    try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        setError(data.error || 'Failed to create account.');
-      } else {
-        router.push('/sign_in?registered=true');
+  async function handleSubmit(data: z.infer<typeof registerSchema>) {
+    startTransition(async () => {
+      const response = await registerUser(data);
+      if (response?.error) {
+        form.setError('root', {
+          message: response.error,
+        });
+        return;
       }
-    } catch (error) {
-      setError('Failed to connect to registration servers.');
-      devLog(error);
-    } finally {
-      setLoading(false);
-    }
+      if (response?.success) {
+        toast.success('Account created successfully!', {
+          description: 'Welcome aboard! Redirecting you to your dashboard...',
+        });
+      }
+    });
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
+    <Card
       className="
-        w-full max-w-sm space-y-4 rounded-lg border border-neutral-200 bg-white
-        p-8 shadow-md
+        w-full
+        sm:max-w-md
       "
     >
-      <h2 className="text-center text-2xl font-semibold text-neutral-900">
-        Create Account
-      </h2>
-      {error && (
-        <div className="rounded-sm bg-red-100 p-3 text-sm text-red-700">
-          {error}
-        </div>
-      )}
-      <div>
-        <label
-          htmlFor="name"
-          className="block text-sm font-medium text-neutral-700"
-        >
-          Full Name
-        </label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          required
+      <CardHeader>
+        <CardTitle className="px-4">Create Account</CardTitle>
+      </CardHeader>
+      <CardContent className="flex justify-center">
+        <form
+          id="form-register"
+          onSubmit={form.handleSubmit(handleSubmit)}
           className="
-            mt-1 block w-full rounded-md border border-neutral-300 bg-white px-3
-            py-2 text-neutral-900 shadow-sm
-            focus:border-primary-500 focus:ring-primary-500
+            w-full max-w-sm space-y-4 rounded-lg border border-neutral-200
+            bg-white p-8 shadow-md
           "
-        />
-      </div>
-      <div>
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-neutral-700"
         >
-          Email Address
-        </label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          required
-          className="
-            mt-1 block w-full rounded-md border border-neutral-300 bg-white px-3
-            py-2 text-neutral-900 shadow-sm
-            focus:border-primary-500 focus:ring-primary-500
-          "
-        />
-      </div>
-      <div>
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-neutral-700"
-        >
-          Password (Min 8 chars)
-        </label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          required
-          minLength={8}
-          className="
-            mt-1 block w-full rounded-md border border-neutral-300 bg-white px-3
-            py-2 text-neutral-900 shadow-sm
-            focus:border-primary-500 focus:ring-primary-500
-          "
-        />
-      </div>
-      <button
-        type="submit"
-        disabled={loading}
-        className="
-          w-full rounded-md bg-primary-600 py-2 text-white
-          hover:bg-primary-700
-        "
-      >
-        {loading ? 'Creating account...' : 'Register'}
-      </button>
+          <FieldGroup>
+            <Controller
+              name="name"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-register-name">Name</FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-register-name"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="John Doe"
+                    autoComplete="name"
+                  />
+                  <FieldError>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+            <Controller
+              name="email"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="form-register-email">Email</FieldLabel>
+                  <Input
+                    {...field}
+                    id="form-register-email"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="john.doe@example.com"
+                    autoComplete="email"
+                    onChange={(e) => {
+                      const cleanValue = e.target.value
+                        .replace(/\s+/g, '')
+                        .replace(/[^\x20-\x7E]/g, '');
+                      field.onChange(cleanValue);
+                    }}
+                  />
+                  <FieldError>{fieldState.error?.message}</FieldError>
+                </Field>
+              )}
+            />
+            <PasswordField
+              form={form}
+              name="password"
+              id="form-register-password"
+              label="Password"
+              autoComplete="new-password"
+            />
+            <PasswordField
+              form={form}
+              name="confirmPassword"
+              id="form-register-confirmPassword"
+              label="Confirm Password"
+              autoComplete="none"
+            />
+          </FieldGroup>
 
-      <p className="mt-4 text-center text-sm">
-        Already have an account?{' '}
-        <Link
-          href="/sign_in"
-          className="
-            text-primary-600
-            hover:underline
-          "
-        >
-          Sign in
-        </Link>
-      </p>
-    </form>
+          {form.formState.errors.root && (
+            <Alert
+              variant="destructive"
+              className="animate-in duration-200 fade-in-50"
+            >
+              <AlertCircle className="size-4" />
+              <AlertTitle>Registration Failed</AlertTitle>
+              <AlertDescription>
+                {form.formState.errors.root.message}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <Field>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? 'Creating account...' : 'Register'}
+            </Button>
+          </Field>
+          <Separator />
+          <Item>
+            <ItemContent>
+              <ItemDescription>Already have an account?</ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <Button variant="link">
+                <Link
+                  href="/sign_in"
+                  className="
+                    text-primary-600
+                    hover:underline
+                  "
+                >
+                  Sign in
+                </Link>
+              </Button>
+            </ItemActions>
+          </Item>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
