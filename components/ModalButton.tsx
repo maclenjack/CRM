@@ -1,6 +1,8 @@
+'use client';
+
 import { useState } from 'react';
 
-import { Button } from '@/components';
+import { Button } from '@/components/Button';
 
 interface ModalButtonProps {
   Modal: React.ComponentType<{ isOpen: boolean; onClose: () => void }>;

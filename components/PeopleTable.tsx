@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { Table } from '@/components';
+import { Table } from '@/components/Table';
 import { Person, TableColumn, Visibility } from '@/types';
 
 interface PeopleTableProps {

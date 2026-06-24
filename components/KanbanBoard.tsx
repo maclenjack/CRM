@@ -16,7 +16,9 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 
-import { DealCard, DealCardOverlay, KanbanBoardStage } from '@/components';
+import { DealCard } from '@/components/DealCard';
+import { DealCardOverlay } from '@/components/DealCardOverlay';
+import { KanbanBoardStage } from '@/components/KanbanBoardStage';
 import {
   Deal,
   DealsByStageMap,

@@ -1,4 +1,4 @@
-import { NavLink } from '@/components';
+import { NavLink } from '@/components/NavLink';
 
 export function ContactsSidebar() {
   return (
