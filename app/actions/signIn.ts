@@ -2,17 +2,19 @@
 
 import { AuthError } from 'next-auth';
 
-import { signIn } from '@/auth';
+import z from 'zod';
 
-export default async function NextAuthSignInAction(formData: FormData) {
+import { signIn as nextAuthSignIn } from '@/auth';
+import { signInSchema } from '@/schemas/user.schema';
+
+export async function signIn(data: z.infer<typeof signInSchema>) {
   try {
-    const email = formData.get('email');
-    const password = formData.get('password');
+    const { email, password } = data;
 
-    await signIn('credentials', {
+    await nextAuthSignIn('credentials', {
       email,
       password,
-      redirect: false,
+      redirectTo: '/dashboard',
     });
 
     return { success: true };
