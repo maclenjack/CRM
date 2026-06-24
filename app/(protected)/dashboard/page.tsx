@@ -1,7 +1,11 @@
+import { auth } from '@/auth';
 import { Card } from '@/components/Card';
 import { NavLink } from '@/components/NavLink';
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const session = await auth();
+  if (!session?.user) return null;
+
   return (
     <div className="flex min-h-screen flex-col items-center bg-neutral-50 py-12">
       <h1 className="mb-8 text-4xl font-semibold text-neutral-900">
