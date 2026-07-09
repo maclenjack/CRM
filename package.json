@@ -9,7 +9,6 @@
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
-    "generate-barrels": "node build-barrels.js",
     "db:format": "prisma format",
     "db:reset": "prisma migrate reset --force",
     "db:seed": "prisma db seed",
