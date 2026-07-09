@@ -1,6 +1,9 @@
+import { Building2Icon, PlusIcon } from 'lucide-react';
+
 import { auth } from '@/auth';
 import { ModalButton } from '@/components/ModalButton';
 import { EmptyTable } from '@/components/table/EmptyTable';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -28,67 +31,81 @@ export default async function OrganizationsPage() {
     });
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div
+      className="
+        mx-auto w-full max-w-7xl space-y-8 p-6
+        md:p-10
+      "
+    >
       <div
         className="
-          mx-auto w-full max-w-7xl flex-1 space-y-6 p-6
-          md:p-8
+          flex flex-col gap-4 border-b border-muted/60 pb-6
+          sm:flex-row sm:items-center sm:justify-between
         "
       >
-        <div
-          className="
-            flex flex-col gap-4 border-b pb-6
-            sm:flex-row sm:items-center sm:justify-between
-          "
-        >
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Activities</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Log, track, and manage recent tasks, calls, and follow-ups.
-            </p>
-          </div>
-
-          <div
+        <div>
+          <h1
             className="
-              flex items-center gap-2 self-start
-              sm:self-auto
+              flex items-center gap-3 text-3xl font-bold tracking-tight
+              text-foreground
             "
           >
-            <ModalButton
-              modalComponent={AddOrganizationModal}
-              modalProps={{ onSubmitSuccess: createOrganization }}
-            >
-              + Organization
-            </ModalButton>
-          </div>
+            <Building2Icon className="size-7 text-secondary" />
+            Organizations
+          </h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Manage your corporate accounts, tracking interactions, active deals,
+            and key contacts.
+          </p>
         </div>
 
-        <Card className="overflow-hidden border-muted shadow-sm">
-          {organizations.length === 0 ? (
-            <EmptyTable />
-          ) : (
-            <>
-              <CardHeader className="border-b px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg font-medium">
-                      Activity Log
-                    </CardTitle>
-                    <CardDescription>
-                      Showing {organizations.length} total{' '}
-                      {organizations.length > 1 ? 'records' : 'record'} for your
-                      account.
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <OrganizationsTable organizations={organizations} />
-              </CardContent>
-            </>
-          )}
-        </Card>
+        <div
+          className="
+            flex items-center gap-2 self-start
+            sm:self-auto
+          "
+        >
+          <ModalButton
+            modalComponent={AddOrganizationModal}
+            modalProps={{ onSubmitSuccess: createOrganization }}
+            asChild
+          >
+            <Button size="sm" className="gap-2 font-medium shadow-sm">
+              <PlusIcon className="size-4" />
+              New Organization
+            </Button>
+          </ModalButton>
+        </div>
       </div>
+
+      {organizations.length === 0 ? (
+        <EmptyTable message="No organizations found" />
+      ) : (
+        <Card
+          className="
+            overflow-hidden rounded-xl border border-border/80 bg-card shadow-xs
+          "
+        >
+          <CardHeader className="border-b border-border/50 bg-muted/30 px-6 py-5">
+            <div>
+              <CardTitle className="text-base font-semibold tracking-tight">
+                All Records
+              </CardTitle>
+              <CardDescription className="mt-0.5 text-xs">
+                Showing{' '}
+                <span className="font-medium text-foreground">
+                  {organizations.length}
+                </span>{' '}
+                individual account{organizations.length > 1 ? 's' : ''} mapped
+                to your profile.
+              </CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <OrganizationsTable organizations={organizations} />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

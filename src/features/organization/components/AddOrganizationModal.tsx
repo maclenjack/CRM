@@ -3,6 +3,7 @@
 import { useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Building2Icon } from 'lucide-react';
 import type z from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -37,6 +38,7 @@ export function AddOrganizationModal({
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<OrganizationFormValues>({
     resolver: zodResolver(OrganizationFormSchema),
@@ -48,59 +50,105 @@ export function AddOrganizationModal({
   const handleFormSubmit = async (
     rawData: z.input<typeof OrganizationFormSchema>
   ) => {
-    // Placeholder for actual submission logic
-    console.log('Creating organization:', rawData.name);
-    onSubmitSuccess(rawData);
-    onClose();
+    try {
+      const validatedData = OrganizationFormSchema.parse(rawData);
+
+      await onSubmitSuccess(validatedData);
+
+      reset();
+      onClose();
+    } catch (apiError) {
+      console.error(
+        'Submission failed parsing active payload context:',
+        apiError
+      );
+    }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         className="
-          rounded-xl border border-slate-100 bg-white p-6 shadow-xl
-          sm:max-w-120
+          rounded-xl border border-border bg-card p-6 shadow-lg transition-all
+          sm:max-w-115
         "
       >
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">
+        <DialogHeader className="space-y-1.5 pr-6">
+          <DialogTitle
+            className="
+              flex items-center gap-2.5 text-xl font-bold tracking-tight
+              text-foreground
+            "
+          >
+            <div
+              className="
+                shrink-0 rounded-md border border-border/40 bg-muted p-1.5
+                text-secondary
+              "
+            >
+              <Building2Icon className="size-4.5" />
+            </div>
             Create New Organization
           </DialogTitle>
-          <DialogDescription className="text-sm text-slate-500">
-            TODO: description
+          <DialogDescription className="text-xs/relaxed text-muted-foreground">
+            Add a profile for a new client company or account partnership
+            record.
           </DialogDescription>
         </DialogHeader>
 
         <form
           onSubmit={handleSubmit(handleFormSubmit)}
-          className="space-y-4 pt-2"
+          className="space-y-6 pt-2"
         >
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="name" className="font-semibold text-slate-700">
-              Name
+          <div className="space-y-2">
+            <Label
+              htmlFor="name"
+              className="
+                text-[10px] font-bold tracking-wider text-muted-foreground
+                uppercase
+              "
+            >
+              Organization Name
             </Label>
             <Input
               id="name"
-              placeholder="e.g. Acme Corp"
+              placeholder="e.g. Acme Corporation"
+              className="
+                h-10 bg-background text-sm
+                focus-visible:ring-1 focus-visible:ring-ring
+              "
               {...register('name')}
             />
             {errors.name && (
-              <span className="text-xs font-medium text-red-600">
+              <p className="mt-1 text-xs font-medium text-destructive">
                 {errors.name.message}
-              </span>
+              </p>
             )}
           </div>
-          <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
+
+          {/* Added items-center for perfectly balanced button heights */}
+          <div
+            className="
+              flex items-center justify-end gap-2 border-t border-border/60 pt-4
+            "
+          >
             <Button
               type="button"
               variant="ghost"
+              size="sm"
+              className="h-9 px-4 text-xs font-medium"
               onClick={onClose}
               disabled={isSubmitting}
             >
               Cancel
             </Button>
-            <Button type="submit" variant="default" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save Activity'}
+            <Button
+              type="submit"
+              size="sm"
+              className="h-9 px-4 text-xs font-medium shadow-sm"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Saving...' : 'Create Organization'}
             </Button>
           </div>
         </form>

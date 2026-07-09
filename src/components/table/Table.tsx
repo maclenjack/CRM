@@ -23,6 +23,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+declare module '@tanstack/react-table' {
+  interface ColumnMeta<TData, TValue> {
+    align?: 'left' | 'center' | 'right';
+  }
+}
+
 interface TableProps<T> {
   columns: ColumnDef<T, any>[];
   data: T[];
@@ -68,6 +74,8 @@ export function Table<T>({
                 const isSortable = header.column.getCanSort();
                 const isSorted = header.column.getIsSorted();
 
+                const align = header.column.columnDef.meta?.align || 'left';
+
                 return (
                   <TableHead
                     key={header.id}
@@ -76,7 +84,9 @@ export function Table<T>({
                         `
                           cursor-pointer transition-colors select-none
                           hover:bg-muted/50
-                        `
+                        `,
+                      align === 'center' && 'text-center',
+                      align === 'right' && 'text-right'
                     )}
                     onClick={
                       isSortable
@@ -84,7 +94,13 @@ export function Table<T>({
                         : undefined
                     }
                   >
-                    <div className="flex items-center gap-2">
+                    <div
+                      className={clsx(
+                        'flex items-center gap-2',
+                        align === 'center' && 'justify-center',
+                        align === 'right' && 'justify-end'
+                      )}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -93,7 +109,7 @@ export function Table<T>({
                           )}
 
                       {isSortable && (
-                        <span className="text-muted-foreground/70">
+                        <span className="shrink-0 text-muted-foreground/70">
                           {isSorted === 'asc' && (
                             <ArrowUpIcon className="size-3.5 stroke-[2.5]" />
                           )}
@@ -113,11 +129,23 @@ export function Table<T>({
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+                {row.getVisibleCells().map((cell) => {
+                  const align = cell.column.columnDef.meta?.align || 'left';
+                  return (
+                    <TableCell
+                      key={cell.id}
+                      className={clsx(
+                        align === 'center' && 'text-center',
+                        align === 'right' && 'text-right'
+                      )}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  );
+                })}
               </TableRow>
             ))
           ) : (
