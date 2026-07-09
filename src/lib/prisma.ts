@@ -1,6 +1,6 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 
-import { PrismaClient } from '@/db';
+import { PrismaClient } from '@/generated/prisma/client';
 
 const prismaClientSingleton = () => {
   return new PrismaClient({
