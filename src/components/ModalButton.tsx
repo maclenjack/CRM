@@ -1,20 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { type ComponentType, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 
-interface ModalButtonProps {
-  Modal: React.ComponentType<{ isOpen: boolean; onClose: () => void }>;
+interface BaseModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+interface ModalButtonProps<T = Record<string, never>> {
+  modalComponent: ComponentType<T & BaseModalProps>;
+  modalProps?: T;
   children: React.ReactNode;
 }
 
-export function ModalButton({ Modal, children }: ModalButtonProps) {
+export function ModalButton<T = Record<string, never>>({
+  modalComponent: Modal,
+  modalProps,
+  children,
+}: ModalButtonProps<T>) {
   const [isModalOpen, setModalOpen] = useState(false);
   return (
     <>
       <Button onClick={() => setModalOpen(true)}>{children}</Button>
-      <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setModalOpen(false)}
+          {...(modalProps as T)}
+        />
+      )}
     </>
   );
 }
