@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/outline';
 import { clsx } from 'clsx';
 
-import { type TableColumn } from '@/types';
+import type { TableColumn } from '@/types/table';
 
 interface TableProps<T> {
   columns: Array<TableColumn<T>>;
