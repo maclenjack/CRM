@@ -79,8 +79,6 @@ export default async function OrganizationsPage() {
       </div>
 
       {organizations.length === 0 ? (
-        <EmptyTable message="No organizations found" />
-      ) : (
         <Card
           className="
             overflow-hidden rounded-xl border border-border/80 bg-card shadow-xs
@@ -105,6 +103,28 @@ export default async function OrganizationsPage() {
             <OrganizationsTable organizations={organizations} />
           </CardContent>
         </Card>
+      ) : (
+        <EmptyTable
+          title="No organizations found"
+          description="Get started by adding your first client company or partnership record to track pipelines."
+          icon={Building2Icon}
+          action={
+            <ModalButton
+              modalComponent={AddOrganizationModal}
+              modalProps={{ onSubmitSuccess: createOrganization }}
+              asChild
+            >
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 px-4 text-xs font-medium"
+              >
+                <PlusIcon className="mr-1.5 size-3.5" />
+                Add First Organization
+              </Button>
+            </ModalButton>
+          }
+        />
       )}
     </div>
   );
