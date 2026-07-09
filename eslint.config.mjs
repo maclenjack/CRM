@@ -26,7 +26,8 @@ export default typescriptEslint.config([
       'types/routes.d.ts',
       'types/validator.ts',
       'generated/**',
-      'prisma/**',
+      'prisma/migrations/**',
+      'prisma/schema.prisma',
     ],
   },
   {
@@ -52,7 +53,7 @@ export default typescriptEslint.config([
     },
     settings: {
       'better-tailwindcss': {
-        entryPoint: `${import.meta.dirname}/app/globals.css`,
+        entryPoint: `${import.meta.dirname}/src/app/globals.css`,
       },
     },
     rules: {

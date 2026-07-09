@@ -1,6 +1,7 @@
-import { PrismaClient } from "../generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
 import { config } from '@dotenvx/dotenvx';
+import { PrismaPg } from '@prisma/adapter-pg';
+
+import { PrismaClient } from '@/generated/prisma/client';
 
 config({ path: ['.env.local', '.env'] });
 
@@ -110,7 +111,7 @@ export async function main() {
   const deal1 = await prisma.deal.create({
     data: {
       title: 'Enterprise Software License',
-      value: 15000.00,
+      value: 15000.0,
       currency: 'NZD',
       stage: 'PROPOSAL_MADE',
       status: 'OPEN',
@@ -129,7 +130,7 @@ export async function main() {
   const deal2 = await prisma.deal.create({
     data: {
       title: 'Custom Development Project',
-      value: 45000.00,
+      value: 45000.0,
       currency: 'NZD',
       stage: 'CONTACT_MADE',
       status: 'OPEN',
