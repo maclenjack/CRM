@@ -16,7 +16,7 @@ export default async function DealsPage() {
             </h1>
             <p className="text-sm text-neutral-600">0 deals</p>
           </div>
-          <ModalButton Modal={AddDealModal}>+ Deal</ModalButton>
+          <ModalButton modalComponent={AddDealModal}>+ Deal</ModalButton>
         </div>
       </div>
     </div>
