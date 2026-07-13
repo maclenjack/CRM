@@ -17,33 +17,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { getActivityBadgeStyles } from '@/features/activity/utils/styles';
 import prisma from '@/lib/prisma';
-
-/**
- * Maps the Prisma ActivityType enum values to theme-compliant Tailwind color utilities.[cite: 3]
- */
-function getActivityBadgeStyles(type: string) {
-  switch (type) {
-    case 'CALL':
-      return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-800/30';
-    case 'EMAIL':
-      return 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border-blue-200/50 dark:border-blue-800/30';
-    case 'MEETING':
-      return 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400 border-purple-200/50 dark:border-purple-800/30';
-    case 'DEADLINE':
-      return 'bg-destructive/10 text-destructive dark:bg-destructive/20 border-destructive/20';
-    case 'LUNCH':
-      return 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200/50 dark:border-amber-800/30';
-    default:
-      return 'bg-muted text-muted-foreground border-border/50';
-  }
-}
 
 export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) return null;
 
-  // 1. Concurrent non-blocking database operations scoped to the current active user session[cite: 3]
   const [
     contactsCount,
     pendingActivitiesCount,
@@ -59,7 +39,7 @@ export default async function DashboardPage() {
     prisma.activity.count({
       where: {
         ownerId: session.user.id,
-        done: false, // Matches boolean mapping in schema[cite: 3]
+        done: false,
         deletedAt: null,
       },
     }),
@@ -74,7 +54,7 @@ export default async function DashboardPage() {
       },
     }),
     prisma.activity.findMany({
-      take: 3, // Constrains response to only top 3 items
+      take: 3,
       where: {
         ownerId: session.user.id,
         done: false,
@@ -84,12 +64,11 @@ export default async function DashboardPage() {
         createdAt: 'desc',
       },
       include: {
-        contactPerson: true, // Eager load contact names accurately[cite: 3]
+        contactPerson: true,
       },
     }),
   ]);
 
-  // 2. Data transformation layers
   const metrics = {
     contactsCount: contactsCount.toLocaleString(),
     activeActivities: `${pendingActivitiesCount} pending`,
@@ -104,7 +83,6 @@ export default async function DashboardPage() {
       "
     >
       <div className="w-full space-y-8 px-6 py-10">
-        {/* Header Section */}
         <div className="space-y-2 border-b border-border pb-6">
           <h1
             className="
@@ -115,18 +93,16 @@ export default async function DashboardPage() {
             Welcome back, {session.user.name || 'User'}
           </h1>
           <p className="text-muted-foreground">
-            Here's what's happening across your CRM workspace today.
+            Here&apos;s what&apos;s happening across your CRM workspace today.
           </p>
         </div>
 
-        {/* Navigation & Insight Cards Grid */}
         <div
           className="
             grid w-full grid-cols-1 gap-6
             sm:grid-cols-3
           "
         >
-          {/* Contacts Card */}
           <Link href="/contacts" className="group block">
             <Card
               className="
@@ -177,7 +153,6 @@ export default async function DashboardPage() {
             </Card>
           </Link>
 
-          {/* Activities Card */}
           <Link href="/activities" className="group block">
             <Card
               className="
@@ -229,7 +204,6 @@ export default async function DashboardPage() {
             </Card>
           </Link>
 
-          {/* Deals Card */}
           <Link href="/deals" className="group block">
             <Card
               className="
@@ -281,14 +255,12 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        {/* Secondary Analytical Section Workspace */}
         <div
           className="
             grid grid-cols-1 gap-6 pt-4
             lg:grid-cols-3
           "
         >
-          {/* Recent Activity Audit Stream (2/3 Grid Segment) */}
           <div
             className="
               space-y-4
@@ -353,7 +325,6 @@ export default async function DashboardPage() {
                       hover:bg-accent/10
                     "
                   >
-                    {/* Dynamic Contextual Type Badge */}
                     <div
                       className={`
                         shrink-0 rounded-md border px-2 py-1 text-[10px]
@@ -364,7 +335,6 @@ export default async function DashboardPage() {
                       {act.type}
                     </div>
 
-                    {/* Information Framework Hierarchy */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
                         <p
@@ -403,7 +373,6 @@ export default async function DashboardPage() {
             </Card>
           </div>
 
-          {/* Quick Shortcuts Matrix (1/3 Grid Segment) */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold tracking-tight">
               Quick Shortcuts
