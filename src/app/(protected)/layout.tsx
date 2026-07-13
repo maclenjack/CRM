@@ -1,6 +1,7 @@
 import { SessionProvider } from 'next-auth/react';
 import { type ReactNode } from 'react';
 
+import { auth } from '@/auth';
 import { AppSidebar } from '@/components/sidebar/AppSidebar';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -13,9 +14,14 @@ interface DashboardLayoutProps {
   children: ReactNode;
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default async function DashboardLayout({
+  children,
+}: DashboardLayoutProps) {
+  const session = await auth();
+  if (!session?.user) return null;
+
   return (
-    <SessionProvider>
+    <SessionProvider session={session}>
       <SidebarProvider
         defaultOpen={true}
         style={

@@ -1,5 +1,6 @@
 'use client';
 
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -37,12 +38,24 @@ import {
 export function AppSidebar() {
   const pathname = usePathname();
   const isContactsActive = pathname.startsWith('/contacts');
-
   const [isContactsOpen, setIsContactsOpen] = useState(isContactsActive);
+
+  const { data: session } = useSession();
+  const user = session?.user;
 
   useEffect(() => {
     setIsContactsOpen(isContactsActive);
   }, [pathname, isContactsActive]);
+
+  if (!user) return null;
+
+  const initials = user.name
+    ? user.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+    : 'U';
 
   return (
     <Sidebar className="border-r border-border/50 bg-muted/30">
@@ -259,19 +272,19 @@ export function AppSidebar() {
         >
           <Avatar className="size-9 shrink-0 border border-border/50">
             <AvatarFallback className="bg-secondary/10 text-xs font-semibold text-secondary">
-              JM
+              {initials}
             </AvatarFallback>
           </Avatar>
           <div className="flex min-w-0 flex-1 flex-col select-none">
             <span className="truncate text-sm/tight font-semibold text-foreground">
-              Jack Maclennan
+              {user.name ?? 'User Account'}
             </span>
             <span
               className="
                 mt-0.5 truncate text-xs leading-none text-muted-foreground/80
               "
             >
-              jackwmaclennan@gmail.com
+              {user.email}
             </span>
           </div>
         </Link>
