@@ -13,6 +13,7 @@ import {
 import { clsx } from 'clsx';
 import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 
+import { EmptyTable } from '@/components/table/EmptyTable';
 import {
   Table as ShadTable,
   TableBody,
@@ -60,7 +61,7 @@ export function Table<T>({
     },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(), // Handles engine-level sorting safely
+    getSortedRowModel: getSortedRowModel(),
   });
 
   return (
@@ -149,14 +150,7 @@ export function Table<T>({
               </TableRow>
             ))
           ) : (
-            <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-24 text-center text-muted-foreground"
-              >
-                No data available.
-              </TableCell>
-            </TableRow>
+            <EmptyTable />
           )}
         </TableBody>
       </ShadTable>
