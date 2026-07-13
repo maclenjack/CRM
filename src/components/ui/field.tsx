@@ -130,10 +130,11 @@ function FieldContent({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-function FieldLabel({
-  className,
-  ...props
-}: React.ComponentProps<typeof Label>) {
+export interface FieldLabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+  required?: boolean;
+}
+
+function FieldLabel({ className, required, ...props }: FieldLabelProps) {
   return (
     <Label
       data-slot="field-label"
@@ -148,6 +149,7 @@ function FieldLabel({
           dark:has-data-checked:bg-primary/10
         `,
         'has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col',
+        required && "after:ml-0.5 after:text-destructive after:content-['*']",
         className
       )}
       {...props}
