@@ -1,85 +1,281 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import { Briefcase, Calendar, Home, User } from 'lucide-react';
+import { clsx } from 'clsx';
+import {
+  Building2Icon,
+  CalendarDays,
+  ChevronRight,
+  FolderKanban,
+  LayoutDashboard,
+  UserIcon,
+  UsersIcon,
+} from 'lucide-react';
 
-import { ContactsButton } from '@/components/sidebar/ContactsButton';
-import { SidebarLink } from '@/components/sidebar/SidebarLink';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
-  SidebarSeparator,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 
 export function AppSidebar() {
-  const { data } = useSession();
+  const pathname = usePathname();
+  const isContactsActive = pathname.startsWith('/contacts');
+
+  const [isContactsOpen, setIsContactsOpen] = useState(isContactsActive);
+
+  useEffect(() => {
+    setIsContactsOpen(isContactsActive);
+  }, [pathname, isContactsActive]);
+
   return (
-    <Sidebar
-      collapsible="none"
-      className="h-full w-full! border-r-0 bg-sidebar"
-    >
-      <SidebarHeader>
-        <SidebarGroup>
-          <div className="text-2xl font-semibold text-primary">CRM</div>
-        </SidebarGroup>
+    <Sidebar className="border-r border-border/50 bg-muted/30">
+      <SidebarHeader
+        className="
+          flex h-14 flex-row items-center gap-2.5 border-b border-border/40 px-6
+        "
+      >
+        <div
+          className="
+            flex size-6 shrink-0 items-center justify-center rounded-md
+            bg-secondary text-xs font-black text-secondary-foreground shadow-xs
+          "
+        >
+          ●
+        </div>
+        <span
+          className="
+            text-base font-bold tracking-tight text-foreground select-none
+          "
+        >
+          CRM
+        </span>
       </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Links</SidebarGroupLabel>
-          <SidebarMenu>
+
+      <SidebarContent className="space-y-6 p-4">
+        <div>
+          <span
+            className="
+              mb-2 block px-3 text-[10px] font-bold tracking-wider
+              text-muted-foreground/60 uppercase select-none
+            "
+          >
+            Navigation Links
+          </span>
+          <SidebarMenu className="gap-1">
             <SidebarMenuItem>
-              <SidebarLink
-                href="/dashboard"
-                className="flex items-center gap-2"
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/dashboard'}
+                className={clsx(
+                  'w-full transition-all duration-200',
+                  pathname === '/dashboard' &&
+                    `
+                      bg-secondary/15 font-semibold text-secondary
+                      hover:bg-secondary/20
+                    `
+                )}
               >
-                <Home className="size-5" /> Dashboard
-              </SidebarLink>
+                <Link href="/dashboard">
+                  <LayoutDashboard className="size-4.5 shrink-0" />
+                  <span>Dashboard</span>
+                </Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
+
             <SidebarMenuItem>
-              <SidebarLink
-                href="/activities"
-                className="flex items-center gap-2"
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/activities'}
+                className={clsx(
+                  'w-full transition-all duration-200',
+                  pathname === '/activities' &&
+                    `
+                      bg-secondary/15 font-semibold text-secondary
+                      hover:bg-secondary/20
+                    `
+                )}
               >
-                <Calendar className="size-5" /> Activities
-              </SidebarLink>
+                <Link href="/activities">
+                  <CalendarDays className="size-4.5 shrink-0" />
+                  <span>Activities</span>
+                </Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
+
+            <Collapsible
+              open={isContactsOpen}
+              onOpenChange={setIsContactsOpen}
+              className="group/collapsible w-full"
+            >
+              <SidebarMenuItem className="relative">
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === '/contacts'}
+                  className={clsx(
+                    'w-full pr-10 transition-all duration-200',
+                    pathname === '/contacts' &&
+                      `
+                        bg-secondary/15 font-semibold text-secondary
+                        hover:bg-secondary/20
+                      `,
+                    pathname !== '/contacts' &&
+                      isContactsActive &&
+                      'bg-transparent font-semibold text-secondary'
+                  )}
+                >
+                  <Link href="/contacts">
+                    <UsersIcon className="size-4.5 shrink-0" />
+                    <span>Contacts</span>
+                  </Link>
+                </SidebarMenuButton>
+
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuAction
+                    className="
+                      right-3 flex size-6 cursor-pointer items-center
+                      justify-center p-0 text-muted-foreground/50 transition-all
+                      duration-200
+                      group-data-[state=open]/collapsible:rotate-90
+                      hover:text-foreground
+                      data-[state=open]:bg-transparent
+                    "
+                  >
+                    <ChevronRight className="size-4" />
+                  </SidebarMenuAction>
+                </CollapsibleTrigger>
+
+                <CollapsibleContent>
+                  <SidebarMenuSub
+                    className="
+                      mt-1 ml-5 space-y-0.5 border-l border-border/70 pl-2
+                    "
+                  >
+                    <SidebarMenuSubItem>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname === '/contacts/people'}
+                        className={clsx(
+                          `
+                            h-8 w-full gap-2.5 rounded-lg px-3 text-sm
+                            transition-all duration-200
+                          `,
+                          pathname === '/contacts/people'
+                            ? `
+                              bg-secondary/15 font-semibold text-secondary
+                              hover:bg-secondary/20
+                            `
+                            : `
+                              text-muted-foreground
+                              hover:text-foreground
+                            `
+                        )}
+                      >
+                        <Link href="/contacts/people">
+                          <UserIcon className="size-4 shrink-0 opacity-80" />
+                          <span>People</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuSubItem>
+
+                    <SidebarMenuSubItem>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname === '/contacts/organizations'}
+                        className={clsx(
+                          `
+                            h-8 w-full gap-2.5 rounded-lg px-3 text-sm
+                            transition-all duration-200
+                          `,
+                          pathname === '/contacts/organizations'
+                            ? `
+                              bg-secondary/15 font-semibold text-secondary
+                              hover:bg-secondary/20
+                            `
+                            : `
+                              text-muted-foreground
+                              hover:text-foreground
+                            `
+                        )}
+                      >
+                        <Link href="/contacts/organizations">
+                          <Building2Icon className="size-4 shrink-0 opacity-80" />
+                          <span>Organizations</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
+
             <SidebarMenuItem>
-              <ContactsButton />
-            </SidebarMenuItem>
-            <SidebarMenuItem>
-              <SidebarLink href="/deals" className="flex items-center gap-2">
-                <Briefcase className="size-5" /> Deals
-              </SidebarLink>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/deals'}
+                className={clsx(
+                  'w-full transition-all duration-200',
+                  pathname === '/deals' &&
+                    `
+                      bg-secondary/15 font-semibold text-secondary
+                      hover:bg-secondary/20
+                    `
+                )}
+              >
+                <Link href="/deals">
+                  <FolderKanban className="size-4.5 shrink-0" />
+                  <span>Deals</span>
+                </Link>
+              </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
-        </SidebarGroup>
+        </div>
       </SidebarContent>
-      <SidebarFooter className="mt-auto">
-        <SidebarSeparator />
-        <SidebarGroup>
-          <SidebarMenuButton className="w-full">
-            <SidebarLink
-              href="/user"
-              className="flex items-center justify-end gap-2 p-4"
+
+      <SidebarFooter className="border-t border-border/40 p-0">
+        <Link
+          href="/user"
+          className="
+            flex h-16 w-full items-center gap-3 px-4 transition-colors
+            duration-200
+            hover:bg-accent/40
+          "
+        >
+          <Avatar className="size-9 shrink-0 border border-border/50">
+            <AvatarFallback className="bg-secondary/10 text-xs font-semibold text-secondary">
+              JM
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex min-w-0 flex-1 flex-col select-none">
+            <span className="truncate text-sm/tight font-semibold text-foreground">
+              Jack Maclennan
+            </span>
+            <span
+              className="
+                mt-0.5 truncate text-xs leading-none text-muted-foreground/80
+              "
             >
-              <User className="size-6 shrink-0" />
-              <span className="shrink-0">
-                {data?.user.name || data?.user.email}
-              </span>
-            </SidebarLink>
-          </SidebarMenuButton>
-        </SidebarGroup>
+              jackwmaclennan@gmail.com
+            </span>
+          </div>
+        </Link>
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   );
 }

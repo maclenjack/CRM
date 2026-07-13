@@ -2,39 +2,74 @@ import { SessionProvider } from 'next-auth/react';
 import { type ReactNode } from 'react';
 
 import { AppSidebar } from '@/components/sidebar/AppSidebar';
+import { Separator } from '@/components/ui/separator';
 import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from '@/components/ui/resizable';
-import { SidebarProvider } from '@/components/ui/sidebar';
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
 
-export default function SidebarLayout({ children }: { children: ReactNode }) {
+interface DashboardLayoutProps {
+  children: ReactNode;
+}
+
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
-    <SidebarProvider>
-      <ResizablePanelGroup
-        orientation="horizontal"
-        className="h-screen! w-full"
+    <SessionProvider>
+      <SidebarProvider
+        defaultOpen={true}
+        style={
+          {
+            '--sidebar-width': '260px',
+            '--sidebar-width-icon': '68px',
+          } as React.CSSProperties
+        }
       >
-        <ResizablePanel
-          defaultSize={200}
-          minSize={130}
-          maxSize={300}
+        <div
           className="
-            hidden
-            md:block
+            flex h-screen w-screen overflow-hidden bg-background
+            selection:bg-secondary/20
           "
         >
-          <SessionProvider>
-            <AppSidebar />
-          </SessionProvider>
-        </ResizablePanel>
-        {/* <ResizableHandle withHandle /> */}
-        <ResizableHandle />
-        <ResizablePanel>
-          <main className="h-full overflow-y-auto p-6">{children}</main>
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </SidebarProvider>
+          <AppSidebar />
+
+          <SidebarInset className="flex h-screen flex-col overflow-hidden bg-background">
+            <header
+              className="
+                z-10 flex h-14 shrink-0 items-center gap-3 border-b
+                border-border/40 bg-background/50 px-4 backdrop-blur-md
+              "
+            >
+              <SidebarTrigger
+                className="
+                  cursor-pointer text-muted-foreground/80 transition-colors
+                  hover:text-foreground
+                "
+              />
+              <Separator orientation="vertical" className="h-4 bg-border/60" />
+              <div
+                className="
+                  flex items-center gap-2 text-xs font-medium
+                  text-muted-foreground select-none
+                "
+              >
+                <span className="text-sm font-semibold text-foreground/90">
+                  CRM Platform
+                </span>
+              </div>
+            </header>
+
+            <div
+              className="
+                flex-1 overflow-y-auto bg-background
+                focus-visible:outline-none
+              "
+            >
+              <div className="size-full">{children}</div>
+            </div>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
+    </SessionProvider>
   );
 }
