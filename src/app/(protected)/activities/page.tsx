@@ -12,7 +12,9 @@ export default async function ActivitiesPage() {
       <div className="flex-1 p-8">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-3xl font-semibold">Activities</h1>
-          <ModalButton Modal={AddActivityModal}>+ New Activity</ModalButton>
+          <ModalButton modalComponent={AddActivityModal}>
+            + New Activity
+          </ModalButton>
         </div>
         <ActivityTable />
       </div>

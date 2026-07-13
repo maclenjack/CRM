@@ -1,20 +1,44 @@
 'use client';
 
-import { useState } from 'react';
+import { type ComponentType, useState } from 'react';
+
+import { Slot } from '@radix-ui/react-slot';
 
 import { Button } from '@/components/ui/button';
 
-interface ModalButtonProps {
-  Modal: React.ComponentType<{ isOpen: boolean; onClose: () => void }>;
-  children: React.ReactNode;
+interface BaseModalProps {
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export function ModalButton({ Modal, children }: ModalButtonProps) {
+interface ModalButtonProps<T = Record<string, never>> {
+  modalComponent: ComponentType<T & BaseModalProps>;
+  modalProps?: T;
+  children: React.ReactNode;
+  asChild?: boolean;
+}
+
+export function ModalButton<T = Record<string, never>>({
+  modalComponent: Modal,
+  modalProps,
+  children,
+  asChild = false,
+}: ModalButtonProps<T>) {
   const [isModalOpen, setModalOpen] = useState(false);
+
+  const Component = asChild ? Slot : Button;
+
   return (
     <>
-      <Button onClick={() => setModalOpen(true)}>{children}</Button>
-      <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
+      <Component onClick={() => setModalOpen(true)}>{children}</Component>
+
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setModalOpen(false)}
+          {...(modalProps as T)}
+        />
+      )}
     </>
   );
 }
