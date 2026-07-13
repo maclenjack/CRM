@@ -54,10 +54,12 @@ export function AddOrganizationModal({
     try {
       const validatedData = OrganizationFormSchema.parse(rawData);
 
-      await onSubmitSuccess(validatedData);
+      const response = await onSubmitSuccess(validatedData);
 
-      reset();
-      onClose();
+      if (response?.success) {
+        reset();
+        onClose();
+      }
     } catch (apiError) {
       console.error(
         'Submission failed parsing active payload context:',

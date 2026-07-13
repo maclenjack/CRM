@@ -76,9 +76,14 @@ export function AddPersonModal({
     remove: removeEmail,
   } = useFieldArray({ control, name: 'emails' });
 
-  const handleFormSubmit = async (data: z.input<typeof PersonFormSchema>) => {
+  const handleFormSubmit = async (
+    rawData: z.input<typeof PersonFormSchema>
+  ) => {
     try {
-      const response = await onSubmitSuccess(data);
+      const validatedData = PersonFormSchema.parse(rawData);
+
+      const response = await onSubmitSuccess(validatedData);
+
       if (response?.success) {
         reset();
         onClose();
