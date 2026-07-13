@@ -248,28 +248,33 @@ export function AppSidebar() {
         </div>
       </SidebarContent>
 
-      <SidebarFooter
-        className="
-          flex h-16 flex-row items-center gap-3 border-t border-border/40 px-4
-        "
-      >
-        <Avatar className="size-9 border border-border/50">
-          <AvatarFallback className="bg-secondary/10 text-xs font-semibold text-secondary">
-            JM
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex min-w-0 flex-1 flex-col select-none">
-          <span className="truncate text-sm/tight font-semibold text-foreground">
-            Jack Maclennan
-          </span>
-          <span
-            className="
-              mt-0.5 truncate text-xs leading-none text-muted-foreground/80
-            "
-          >
-            jackwmaclennan@gmail.com
-          </span>
-        </div>
+      <SidebarFooter className="border-t border-border/40 p-0">
+        <Link
+          href="/user"
+          className="
+            flex h-16 w-full items-center gap-3 px-4 transition-colors
+            duration-200
+            hover:bg-accent/40
+          "
+        >
+          <Avatar className="size-9 shrink-0 border border-border/50">
+            <AvatarFallback className="bg-secondary/10 text-xs font-semibold text-secondary">
+              JM
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex min-w-0 flex-1 flex-col select-none">
+            <span className="truncate text-sm/tight font-semibold text-foreground">
+              Jack Maclennan
+            </span>
+            <span
+              className="
+                mt-0.5 truncate text-xs leading-none text-muted-foreground/80
+              "
+            >
+              jackwmaclennan@gmail.com
+            </span>
+          </div>
+        </Link>
       </SidebarFooter>
     </Sidebar>
   );
