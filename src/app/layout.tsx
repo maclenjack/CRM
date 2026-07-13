@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 
-import { InfoBanner } from '@/components/InfoBanner';
 import { Toaster } from '@/components/ui/sonner';
 
 import './globals.css';
@@ -36,9 +35,6 @@ export default function RootLayout({
       `}
     >
       <body className="flex min-h-full flex-col">
-        <InfoBanner className="m-0!">
-          This is a mockup. No data is loaded.
-        </InfoBanner>
         {children}
         <Toaster richColors closeButton position="top-right" />
       </body>
