@@ -43,6 +43,7 @@ export function AddOrganizationModal({
   } = useForm<OrganizationFormValues>({
     resolver: zodResolver(OrganizationFormSchema),
     defaultValues: { name: '' },
+    mode: 'onTouched',
   });
 
   if (!isOpen) return null;

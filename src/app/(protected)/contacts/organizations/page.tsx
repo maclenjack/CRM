@@ -26,7 +26,7 @@ export default async function OrganizationsPage() {
 
   const organizations: OrganizationTableSelect[] =
     await prisma.organization.findMany({
-      where: { ownerId: session?.user.id },
+      where: { ownerId: session.user.id },
       select: organizationsTableSelect,
     });
 
