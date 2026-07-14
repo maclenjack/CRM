@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache';
 
 import { auth } from '@/auth';
 import type { PersonFormValues } from '@/features/person/person.validation';
+import { createSearchAction } from '@/features/shared/actions/search-factory';
+import type { PersonModel } from '@/generated/prisma/models';
 import prisma from '@/lib/prisma';
 
 export async function createPersonAction(data: PersonFormValues) {
@@ -42,3 +44,9 @@ export async function createPersonAction(data: PersonFormValues) {
     return { success: false, message: 'Failed to create person' };
   }
 }
+
+export const searchPeople = createSearchAction<PersonModel>(prisma.person, {
+  searchField: 'name',
+  selectFields: { id: true, name: true } as any,
+  limit: 15,
+});

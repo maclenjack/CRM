@@ -1,4 +1,9 @@
-import type { PersonGetPayload, PersonSelect } from '@/generated/prisma/models';
+import type {
+  PersonEmailModel,
+  PersonGetPayload,
+  PersonModel,
+  PersonSelect,
+} from '@/generated/prisma/models';
 
 export const personTableSelect = {
   name: true,
@@ -31,3 +36,17 @@ export const personTableSelect = {
 export type PersonTableSelect = PersonGetPayload<{
   select: typeof personTableSelect;
 }>;
+
+export type PersonWithEmails = Pick<PersonModel, 'id' | 'name'> & {
+  emails: Pick<PersonEmailModel, 'email'>[];
+};
+
+export function mapPersonToOption(person: PersonWithEmails) {
+  const firstEmail = person.emails?.[0]?.email;
+
+  return {
+    value: person.id,
+    label: person.name,
+    description: firstEmail || 'No email attached',
+  };
+}
