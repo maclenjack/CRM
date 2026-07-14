@@ -121,7 +121,7 @@ export function OrganizationsTable({
     <Table<OrganizationTableSelect>
       columns={columns}
       data={organizations}
-      className="w-full"
+      className="mt-4"
       defaultSortBy="activities"
       defaultSortDir="asc"
     />

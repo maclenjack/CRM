@@ -1,5 +1,8 @@
 import type { DealStatus } from '@/generated/prisma/enums';
-import type { OrganizationGetPayload } from '@/generated/prisma/models';
+import type {
+  OrganizationGetPayload,
+  OrganizationModel,
+} from '@/generated/prisma/models';
 
 export interface OrganizationsTableData {
   name: string;
@@ -37,3 +40,12 @@ export const organizationsTableSelect = {
 export type OrganizationTableSelect = OrganizationGetPayload<{
   select: typeof organizationsTableSelect;
 }>;
+
+export function mapOrganizationToOption(
+  organization: Pick<OrganizationModel, 'id' | 'name'>
+) {
+  return {
+    value: organization.id,
+    label: organization.name,
+  };
+}

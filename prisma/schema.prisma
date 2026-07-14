@@ -218,10 +218,10 @@ model Label {
 }
 
 model Person {
-  id             String       @id @default(cuid())
+  id             String        @id @default(cuid())
   name           String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId String       @map("organization_id")
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId String?       @map("organization_id")
 
   owner   User   @relation("personOwner", fields: [ownerId], references: [id])
   ownerId String @map("owner_id")
