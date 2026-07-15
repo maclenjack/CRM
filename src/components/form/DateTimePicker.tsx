@@ -23,8 +23,6 @@ interface DateTimePickerProps {
   placeholder?: string;
 }
 
-// TODO clean up the smooth scroll
-
 export function DateTimePicker({
   date,
   setDate,
@@ -45,7 +43,7 @@ export function DateTimePicker({
       newDate.setHours(date.getHours());
       newDate.setMinutes(date.getMinutes());
     } else {
-      newDate.setHours(12, 0); // Default to noon if no time exists yet
+      newDate.setHours(12, 0);
     }
     setDate(newDate);
   };
@@ -60,12 +58,9 @@ export function DateTimePicker({
     setDate(newDate);
   };
 
-  // Auto-scroll to selected time when popover opens
   React.useEffect(() => {
     if (!isOpen || !date) return;
 
-    // Wait for the popover open animation to finish before smooth-scrolling,
-    // otherwise the scroll fights the animation and looks abrupt.
     const timer = setTimeout(() => {
       const smoothScrollTo = (
         areaRef: React.RefObject<HTMLDivElement | null>,
@@ -87,10 +82,10 @@ export function DateTimePicker({
         minuteScrollAreaRef,
         `[data-minute="${date.getMinutes()}"]`
       );
-    }, 200); // 200ms lets the popover fade-in finish before scrolling
+    }, 200);
 
     return () => clearTimeout(timer);
-  }, [isOpen]); // ← intentionally omit `date` so it only fires on open
+  }, [isOpen]);
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen} modal={true}>
@@ -120,14 +115,11 @@ export function DateTimePicker({
         className="flex w-auto flex-row p-0 shadow-lg"
         align="start"
       >
-        {/* Date Selector */}
         <Calendar mode="single" selected={date} onSelect={handleDateSelect} />
 
         <Separator orientation="vertical" />
 
-        {/* Time Selector Columns */}
         <div className="flex">
-          {/* Hours Column */}
           <div className="flex w-18 flex-col">
             <div className="border-b border-border px-2 py-2.5">
               <p
@@ -163,7 +155,6 @@ export function DateTimePicker({
 
           <Separator orientation="vertical" />
 
-          {/* Minutes Column */}
           <div className="flex w-18 flex-col">
             <div className="border-b border-border px-2 py-2.5">
               <p
