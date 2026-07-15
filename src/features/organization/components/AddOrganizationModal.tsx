@@ -14,8 +14,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 import {
   OrganizationFormSchema,
@@ -104,15 +104,16 @@ export function AddOrganizationModal({
           className="space-y-6 pt-2"
         >
           <div className="space-y-2">
-            <Label
+            <FieldLabel
               htmlFor="name"
+              required
               className="
                 text-[10px] font-bold tracking-wider text-muted-foreground
                 uppercase
               "
             >
               Organization Name
-            </Label>
+            </FieldLabel>
             <Input
               id="name"
               placeholder="e.g. Acme Corporation"
@@ -129,7 +130,6 @@ export function AddOrganizationModal({
             )}
           </div>
 
-          {/* Added items-center for perfectly balanced button heights */}
           <div
             className="
               flex items-center justify-end gap-2 border-t border-border/60 pt-4

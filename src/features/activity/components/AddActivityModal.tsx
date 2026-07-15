@@ -16,8 +16,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -133,9 +133,13 @@ export function AddActivityModal({
           className="space-y-4 pt-2"
         >
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="subject" className="font-semibold text-slate-700">
+            <FieldLabel
+              htmlFor="subject"
+              required
+              className="font-semibold text-slate-700"
+            >
               Subject Line
-            </Label>
+            </FieldLabel>
             <Input
               id="subject"
               placeholder="e.g. Follow-up contract discussion"
@@ -150,7 +154,9 @@ export function AddActivityModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label className="font-semibold text-slate-700">Type</Label>
+              <FieldLabel required className="font-semibold text-slate-700">
+                Type
+              </FieldLabel>
               <Controller
                 control={control}
                 name="type"
@@ -179,7 +185,9 @@ export function AddActivityModal({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label className="font-semibold text-slate-700">Priority</Label>
+              <FieldLabel required className="font-semibold text-slate-700">
+                Priority
+              </FieldLabel>
               <Controller
                 control={control}
                 name="priority"
@@ -209,7 +217,9 @@ export function AddActivityModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label className="font-semibold text-slate-700">Starts At</Label>
+              <FieldLabel required className="font-semibold text-slate-700">
+                Starts At
+              </FieldLabel>
               <Controller
                 control={control}
                 name="startDateTime"
@@ -228,7 +238,9 @@ export function AddActivityModal({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label className="font-semibold text-slate-700">Ends At</Label>
+              <FieldLabel required className="font-semibold text-slate-700">
+                Ends At
+              </FieldLabel>
               <Controller
                 control={control}
                 name="endDateTime"
@@ -283,9 +295,9 @@ export function AddActivityModal({
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="note" className="font-semibold text-slate-700">
+            <FieldLabel htmlFor="note" className="font-semibold text-slate-700">
               Notes (Optional)
-            </Label>
+            </FieldLabel>
             <Textarea
               id="note"
               placeholder="Type background meeting logs here..."
