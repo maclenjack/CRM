@@ -1,4 +1,3 @@
-// @/app/dashboard/page.tsx
 import Link from 'next/link';
 import { Suspense } from 'react';
 
@@ -40,14 +39,12 @@ export default async function DashboardPage() {
       icon={LayoutDashboard}
     >
       <div className="space-y-8">
-        {/* METRICS GRID - Instantly visible! */}
         <div
           className="
             grid w-full grid-cols-1 gap-6
             sm:grid-cols-3
           "
         >
-          {/* Contacts Card */}
           <Link href="/contacts" className="group block">
             <Card
               className="
@@ -109,7 +106,6 @@ export default async function DashboardPage() {
             </Card>
           </Link>
 
-          {/* Activities Card */}
           <Link href="/activities" className="group block">
             <Card
               className="
@@ -172,7 +168,6 @@ export default async function DashboardPage() {
             </Card>
           </Link>
 
-          {/* Deals Card */}
           <Link href="/deals" className="group block">
             <Card
               className="
@@ -235,14 +230,12 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        {/* FEED & SHORTCUTS */}
         <div
           className="
             grid grid-cols-1 gap-6 pt-4
             lg:grid-cols-3
           "
         >
-          {/* Recent Activity Stream */}
           <div
             className="
               space-y-4
@@ -286,7 +279,6 @@ export default async function DashboardPage() {
             </Suspense>
           </div>
 
-          {/* Quick Shortcuts (Instantly Active!) */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold tracking-tight">
               Quick Shortcuts

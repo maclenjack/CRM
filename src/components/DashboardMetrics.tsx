@@ -1,4 +1,3 @@
-// @/components/dashboard/DashboardMetrics.tsx
 import Link from 'next/link';
 
 import { Activity, Clock, Plus } from 'lucide-react';

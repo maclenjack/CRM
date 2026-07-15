@@ -6,9 +6,9 @@ import { cn } from '@/features/shared/utils/cn';
 
 interface CRMPageShellProps {
   title: string;
-  subtitle?: string; // Made optional (?)
-  icon?: LucideIcon; // Made optional (?)
-  actionButton?: React.ReactNode; // Made optional (?)
+  subtitle?: string;
+  icon?: LucideIcon;
+  actionButton?: React.ReactNode;
   children: React.ReactNode;
   iconClassName?: string;
 }
@@ -16,7 +16,7 @@ interface CRMPageShellProps {
 export function CRMPageShell({
   title,
   subtitle,
-  icon: Icon, // Captures the optional component
+  icon: Icon,
   actionButton,
   children,
   iconClassName,
@@ -41,7 +41,6 @@ export function CRMPageShell({
               text-foreground
             "
           >
-            {/* Render icon only if it exists */}
             {Icon && (
               <Icon
                 className={cn('size-7', iconClassName || 'text-secondary')}
@@ -49,13 +48,11 @@ export function CRMPageShell({
             )}
             {title}
           </h1>
-          {/* Render subtitle only if it exists */}
           {subtitle && (
             <p className="mt-1.5 text-sm text-muted-foreground">{subtitle}</p>
           )}
         </div>
 
-        {/* Render action button container only if an action button is provided */}
         {actionButton && (
           <div
             className="
