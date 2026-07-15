@@ -7,7 +7,7 @@ import { CRMPageShell } from '@/components/CRMPageShell';
 import { ModalButton } from '@/components/ModalButton';
 import { Button } from '@/components/ui/button';
 import { AddDealModal } from '@/features/deal/components/AddDealModal';
-import { DealKanbanBoardWrapper } from '@/features/deal/components/DealKanbanBoardWrapper';
+import { DealKanbanWrapper } from '@/features/deal/components/DealKanbanWrapper';
 import { createDeal } from '@/features/deal/deal.actions';
 import { KanbanLoadingPlaceholder } from '@/features/kanban-board/components/KanbanLoadingPlaceholder';
 
@@ -34,7 +34,7 @@ export default async function DealsPage() {
       }
     >
       <Suspense fallback={<KanbanLoadingPlaceholder />}>
-        <DealKanbanBoardWrapper />
+        <DealKanbanWrapper />
       </Suspense>
     </CRMPageShell>
   );

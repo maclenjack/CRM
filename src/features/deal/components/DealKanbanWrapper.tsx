@@ -18,7 +18,7 @@ import { PipelineStage } from '@/features/deal/pipeline-stage';
 import type { MoveCardInput } from '@/features/kanban-board/kanban-board.validation';
 import prisma from '@/lib/prisma';
 
-export async function DealKanbanBoardWrapper() {
+export async function DealKanbanWrapper() {
   const session = await auth();
   if (!session?.user) return null;
 

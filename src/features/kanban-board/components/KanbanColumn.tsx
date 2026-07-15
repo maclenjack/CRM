@@ -40,9 +40,8 @@ export function KanbanColumn<T extends KanbanCardData>({
       ref={setNodeRef}
       className={cn(
         `
-          flex min-h-[500px] w-80 shrink-0 flex-col rounded-xl border
-          border-border bg-muted/40 p-2 shadow-none transition-colors
-          duration-200
+          flex min-h-125 w-80 shrink-0 flex-col rounded-xl border border-border
+          bg-muted/40 p-2 shadow-none transition-colors duration-200
         `,
         isOver && 'border-primary/20 bg-muted ring-1 ring-primary/10'
       )}
@@ -82,7 +81,7 @@ export function KanbanColumn<T extends KanbanCardData>({
           {cards.length === 0 && (
             <div
               className="
-                flex min-h-[120px] flex-1 items-center justify-center rounded-lg
+                flex min-h-30 flex-1 items-center justify-center rounded-lg
                 border border-dashed border-muted-foreground/20 p-8 text-center
                 text-xs text-muted-foreground/60
               "
