@@ -1,23 +1,37 @@
-import { type ReactNode } from 'react';
+'use client';
+
+import type { ReactNode } from 'react';
 
 import clsx from 'clsx';
 
-import { PriorityLevel } from '@/models';
+import {
+  PriorityLevel,
+  type PriorityMetadata,
+} from '@/features/priority-level/priority-level';
+import { PriorityLevel as PrismaPriorityLevel } from '@/generated/prisma/enums';
 
 interface PriorityBadgeProps {
-  priority: PriorityLevel;
+  priorityLevel: PriorityMetadata | PrismaPriorityLevel;
   children?: ReactNode;
 }
 
-export function PriorityBadge({ priority, children }: PriorityBadgeProps) {
+export function PriorityBadge({ priorityLevel, children }: PriorityBadgeProps) {
+  let priorityLevelInstance: PriorityMetadata;
+
+  if (typeof priorityLevel === 'string') {
+    priorityLevelInstance = PriorityLevel.fromValue(priorityLevel);
+  } else {
+    priorityLevelInstance = priorityLevel;
+  }
+
   return (
     <span
       className={clsx(
         'rounded-sm px-2 py-0.5 text-xs font-medium',
-        priority.className
+        priorityLevelInstance.className
       )}
     >
-      {children ?? priority.toString()}
+      {children ?? priorityLevelInstance.label}
     </span>
   );
 }

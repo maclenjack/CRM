@@ -2,19 +2,19 @@ import { HelpCircleIcon, type LucideIcon } from 'lucide-react';
 
 import { Card } from '@/components/ui/card';
 
-interface EmptyTableProps {
+interface EmptyStateProps {
   title?: string;
   description?: string;
   icon?: LucideIcon;
   action?: React.ReactNode;
 }
 
-export function EmptyTable({
+export function EmptyState({
   title = 'No records available',
-  description = 'There are no items matching this view or filter configuration.',
+  description = 'There are no items matching this view or configuration.',
   icon: Icon = HelpCircleIcon,
   action,
-}: EmptyTableProps) {
+}: EmptyStateProps) {
   return (
     <Card
       className="

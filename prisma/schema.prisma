@@ -281,6 +281,7 @@ model Deal {
   value             Float         @default(0)
   currency          String        @default("NZD")
   stage             PipelineStage @default(QUALIFIED)
+  position          Float         @default(0)
   status            DealStatus    @default(OPEN)
   priority          PriorityLevel @default(MEDIUM)
   notes             Note[]

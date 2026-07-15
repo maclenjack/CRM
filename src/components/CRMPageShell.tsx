@@ -6,9 +6,9 @@ import { cn } from '@/features/shared/utils/cn';
 
 interface CRMPageShellProps {
   title: string;
-  subtitle: string;
-  icon: LucideIcon;
-  actionButton: React.ReactNode;
+  subtitle?: string;
+  icon?: LucideIcon;
+  actionButton?: React.ReactNode;
   children: React.ReactNode;
   iconClassName?: string;
 }
@@ -41,19 +41,28 @@ export function CRMPageShell({
               text-foreground
             "
           >
-            <Icon className={cn('size-7', iconClassName || 'text-secondary')} />
+            {Icon && (
+              <Icon
+                className={cn('size-7', iconClassName || 'text-secondary')}
+              />
+            )}
             {title}
           </h1>
-          <p className="mt-1.5 text-sm text-muted-foreground">{subtitle}</p>
+          {subtitle && (
+            <p className="mt-1.5 text-sm text-muted-foreground">{subtitle}</p>
+          )}
         </div>
-        <div
-          className="
-            flex items-center gap-2 self-start
-            sm:self-auto
-          "
-        >
-          {actionButton}
-        </div>
+
+        {actionButton && (
+          <div
+            className="
+              flex items-center gap-2 self-start
+              sm:self-auto
+            "
+          >
+            {actionButton}
+          </div>
+        )}
       </div>
 
       <div>{children}</div>

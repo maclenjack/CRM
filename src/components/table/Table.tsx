@@ -13,7 +13,7 @@ import {
 import { clsx } from 'clsx';
 import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react';
 
-import { EmptyTable } from '@/components/table/EmptyTable';
+import { EmptyState } from '@/components/EmptyState';
 import {
   Table as ShadTable,
   TableBody,
@@ -150,7 +150,7 @@ export function Table<T>({
               </TableRow>
             ))
           ) : (
-            <EmptyTable />
+            <EmptyState />
           )}
         </TableBody>
       </ShadTable>
