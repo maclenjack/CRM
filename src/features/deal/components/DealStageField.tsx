@@ -52,7 +52,7 @@ export function DealStageField<
         return (
           <Field className="flex w-full flex-col gap-2">
             <div className="flex items-baseline justify-between">
-              <FieldLabel>{label}</FieldLabel>
+              <FieldLabel required>{label}</FieldLabel>
               <span className="text-sm font-semibold text-primary">
                 {STAGE_LABELS[field.value] || 'Select a stage...'}
               </span>

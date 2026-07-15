@@ -67,7 +67,7 @@ export function CurrencyField<
       name={name}
       render={({ field }) => (
         <Field className={cn('flex flex-col gap-2', className)}>
-          <FieldLabel>{label}</FieldLabel>
+          <FieldLabel required>{label}</FieldLabel>
 
           <Popover open={open} onOpenChange={setOpen} modal>
             <PopoverTrigger asChild>

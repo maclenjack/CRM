@@ -1,6 +1,14 @@
+import { Suspense } from 'react';
+
+import { LayoutListIcon, PlusIcon } from 'lucide-react';
+
 import { auth } from '@/auth';
+import { CRMPageShell } from '@/components/CRMPageShell';
 import { ModalButton } from '@/components/ModalButton';
-import { ActivityTable } from '@/features/activity/components/ActivityTable';
+import { TableLoadingPlaceholder } from '@/components/table/TableLoadingPlaceholder';
+import { Button } from '@/components/ui/button';
+import { createActivity } from '@/features/activity/activity.actions';
+import { ActivitiesTableWrapper } from '@/features/activity/components/ActivitiesTableWrapper';
 import { AddActivityModal } from '@/features/activity/components/AddActivityModal';
 
 export default async function ActivitiesPage() {
@@ -8,16 +16,26 @@ export default async function ActivitiesPage() {
   if (!session?.user) return null;
 
   return (
-    <div className="flex min-h-screen">
-      <div className="flex-1 p-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-3xl font-semibold">Activities</h1>
-          <ModalButton modalComponent={AddActivityModal}>
-            + New Activity
-          </ModalButton>
-        </div>
-        <ActivityTable />
-      </div>
-    </div>
+    <CRMPageShell
+      title="Activities"
+      subtitle="Log, track, and manage recent tasks, calls, and follow-ups."
+      icon={LayoutListIcon}
+      actionButton={
+        <ModalButton
+          modalComponent={AddActivityModal}
+          modalProps={{ onSubmitSuccess: createActivity }}
+          asChild
+        >
+          <Button size="sm" className="gap-2 font-medium shadow-sm">
+            <PlusIcon className="size-4" />
+            New Activity
+          </Button>
+        </ModalButton>
+      }
+    >
+      <Suspense fallback={<TableLoadingPlaceholder />}>
+        <ActivitiesTableWrapper />
+      </Suspense>
+    </CRMPageShell>
   );
 }

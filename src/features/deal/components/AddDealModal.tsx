@@ -211,7 +211,7 @@ export function AddDealModal({
             </div>
 
             <Field className="flex flex-col gap-1.5">
-              <FieldLabel className="font-semibold text-slate-700">
+              <FieldLabel required className="font-semibold text-slate-700">
                 Priority
               </FieldLabel>
 

@@ -8,6 +8,8 @@ import { auth } from '@/auth';
 import { DealFormSchema } from '@/features/deal/deal.validation';
 import { PipelineStage } from '@/features/deal/pipeline-stage';
 import { MoveCardSchema } from '@/features/kanban-board/kanban-board.validation';
+import { createSearchAction } from '@/features/shared/actions/search-factory';
+import type { DealModel } from '@/generated/prisma/models';
 import prisma from '@/lib/prisma';
 
 export async function createDeal(rawInput: unknown) {
@@ -108,3 +110,9 @@ export async function updateDealStageAction(rawInput: unknown) {
     };
   }
 }
+
+export const searchDeals = createSearchAction<DealModel>(prisma.deal, {
+  searchField: 'title',
+  selectFields: { id: true, title: true } as any,
+  limit: 15,
+});

@@ -1,4 +1,8 @@
-import type { DealGetPayload, DealSelect } from '@/generated/prisma/models';
+import type {
+  DealGetPayload,
+  DealModel,
+  DealSelect,
+} from '@/generated/prisma/models';
 
 export const dealKanbanCardSelect = {
   id: true,
@@ -24,3 +28,10 @@ export const dealKanbanCardSelect = {
 export type DealKanbanCard = DealGetPayload<{
   select: typeof dealKanbanCardSelect;
 }>;
+
+export function mapDealToOption(deal: Pick<DealModel, 'id' | 'title'>) {
+  return {
+    value: deal.id,
+    label: deal.title,
+  };
+}
