@@ -47,6 +47,10 @@ export async function createPersonAction(data: PersonFormValues) {
 
 export const searchPeople = createSearchAction<PersonModel>(prisma.person, {
   searchField: 'name',
-  selectFields: { id: true, name: true } as any,
+  selectFields: {
+    id: true,
+    name: true,
+    emails: { select: { email: true } },
+  } as any,
   limit: 15,
 });
