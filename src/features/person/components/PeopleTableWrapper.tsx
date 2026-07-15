@@ -1,29 +1,32 @@
 import { PlusIcon, UserIcon } from 'lucide-react';
 
 import { auth } from '@/auth';
+import { EmptyState } from '@/components/EmptyState';
 import { ModalButton } from '@/components/ModalButton';
 import { RecordTableCard } from '@/components/RecordTableCard';
-import { EmptyTable } from '@/components/table/EmptyTable';
 import { Button } from '@/components/ui/button';
 import { AddPersonModal } from '@/features/person/components/AddPersonModal';
+import {
+  type PersonTableSelect,
+  personTableSelect,
+} from '@/features/person/person';
 import { createPersonAction } from '@/features/person/person.actions';
 import prisma from '@/lib/prisma';
 
-import { personTableSelect } from '../person';
 import { PeopleTable } from './PeopleTable';
 
 export async function PeopleTableWrapper() {
   const session = await auth();
   if (!session?.user) return null;
 
-  const people = await prisma.person.findMany({
+  const people: PersonTableSelect[] = await prisma.person.findMany({
     where: { ownerId: session.user.id },
     select: personTableSelect,
   });
 
   if (people.length === 0) {
     return (
-      <EmptyTable
+      <EmptyState
         title="No people found"
         description="Get started by adding your first individual contact or customer record to track relationships."
         icon={UserIcon}
