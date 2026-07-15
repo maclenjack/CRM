@@ -68,8 +68,7 @@ export async function RecentActivityStream({ userId }: MetricProps) {
             hover:bg-primary/90
           "
         >
-          <Plus className="mr-1.5 size-3.5" /> Create Your First Contact[cite:
-          4]
+          <Plus className="mr-1.5 size-3.5" /> Create Your First Contact
         </Link>
       </div>
     );
