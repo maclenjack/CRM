@@ -1,108 +1,53 @@
+// @/app/dashboard/page.tsx
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 import {
   Activity,
   ArrowUpRight,
   CheckCircle2,
-  Clock,
   DollarSign,
+  LayoutDashboard,
   Plus,
   Users,
 } from 'lucide-react';
 
 import { auth } from '@/auth';
+import { CRMPageShell } from '@/components/CRMPageShell';
+import {
+  ContactsCount,
+  PendingActivitiesCount,
+  PipelineValue,
+  RecentActivityStream,
+} from '@/components/DashboardMetrics';
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { getActivityBadgeStyles } from '@/features/activity/utils/styles';
-import prisma from '@/lib/prisma';
 
 export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) return null;
 
-  const [
-    contactsCount,
-    pendingActivitiesCount,
-    totalPipeline,
-    rawRecentActivities,
-  ] = await Promise.all([
-    prisma.person.count({
-      where: {
-        ownerId: session.user.id,
-        deletedAt: null,
-      },
-    }),
-    prisma.activity.count({
-      where: {
-        ownerId: session.user.id,
-        done: false,
-        deletedAt: null,
-      },
-    }),
-    prisma.deal.aggregate({
-      where: {
-        ownerId: session.user.id,
-        status: 'OPEN',
-        deletedAt: null,
-      },
-      _sum: {
-        value: true,
-      },
-    }),
-    prisma.activity.findMany({
-      take: 3,
-      where: {
-        ownerId: session.user.id,
-        done: false,
-        deletedAt: null,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-      include: {
-        contactPerson: true,
-      },
-    }),
-  ]);
-
-  const metrics = {
-    contactsCount: contactsCount.toLocaleString(),
-    activeActivities: `${pendingActivitiesCount} pending`,
-    pipelineValue: `$${(totalPipeline._sum.value || 0).toLocaleString()}`,
-  };
+  const userId = session.user.id;
 
   return (
-    <div
-      className="
-        min-h-screen bg-background text-foreground transition-colors
-        duration-200
-      "
+    <CRMPageShell
+      title={`Welcome back, ${session.user.name || 'User'}`}
+      subtitle="Here's what's happening across your CRM workspace today."
+      icon={LayoutDashboard}
     >
-      <div className="w-full space-y-8 px-6 py-10">
-        <div className="space-y-2 border-b border-border pb-6">
-          <h1
-            className="
-              text-3xl font-bold tracking-tight
-              sm:text-4xl
-            "
-          >
-            Welcome back, {session.user.name || 'User'}
-          </h1>
-          <p className="text-muted-foreground">
-            Here&apos;s what&apos;s happening across your CRM workspace today.
-          </p>
-        </div>
-
+      <div className="space-y-8">
+        {/* METRICS GRID - Instantly visible! */}
         <div
           className="
             grid w-full grid-cols-1 gap-6
             sm:grid-cols-3
           "
         >
+          {/* Contacts Card */}
           <Link href="/contacts" className="group block">
             <Card
               className="
@@ -144,7 +89,18 @@ export default async function DashboardPage() {
                     tracking-tight
                   "
                 >
-                  {metrics.contactsCount}
+                  <Suspense
+                    fallback={
+                      <span
+                        className="
+                          inline-block h-8 w-12 animate-pulse rounded-sm
+                          bg-muted
+                        "
+                      />
+                    }
+                  >
+                    <ContactsCount userId={userId} />
+                  </Suspense>
                   <span className="ml-2 text-xs font-normal text-muted-foreground">
                     total clients
                   </span>
@@ -153,6 +109,7 @@ export default async function DashboardPage() {
             </Card>
           </Link>
 
+          {/* Activities Card */}
           <Link href="/activities" className="group block">
             <Card
               className="
@@ -195,7 +152,18 @@ export default async function DashboardPage() {
                     dark:text-amber-500
                   "
                 >
-                  {metrics.activeActivities}
+                  <Suspense
+                    fallback={
+                      <span
+                        className="
+                          inline-block h-8 w-24 animate-pulse rounded-sm
+                          bg-muted
+                        "
+                      />
+                    }
+                  >
+                    <PendingActivitiesCount userId={userId} />
+                  </Suspense>
                   <span className="ml-2 text-xs font-normal text-muted-foreground">
                     due today
                   </span>
@@ -204,6 +172,7 @@ export default async function DashboardPage() {
             </Card>
           </Link>
 
+          {/* Deals Card */}
           <Link href="/deals" className="group block">
             <Card
               className="
@@ -245,7 +214,18 @@ export default async function DashboardPage() {
                     tracking-tight
                   "
                 >
-                  {metrics.pipelineValue}
+                  <Suspense
+                    fallback={
+                      <span
+                        className="
+                          inline-block h-8 w-20 animate-pulse rounded-sm
+                          bg-muted
+                        "
+                      />
+                    }
+                  >
+                    <PipelineValue userId={userId} />
+                  </Suspense>
                   <span className="ml-2 text-xs font-normal text-muted-foreground">
                     in pipeline
                   </span>
@@ -255,12 +235,14 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
+        {/* FEED & SHORTCUTS */}
         <div
           className="
             grid grid-cols-1 gap-6 pt-4
             lg:grid-cols-3
           "
         >
+          {/* Recent Activity Stream */}
           <div
             className="
               space-y-4
@@ -281,98 +263,30 @@ export default async function DashboardPage() {
                 View audit history
               </Link>
             </div>
-            <Card className="divide-y divide-border/50 overflow-hidden">
-              {rawRecentActivities.length === 0 ? (
-                <div
-                  className="
-                    flex flex-col items-center justify-center rounded-lg border
-                    border-dashed border-border/60 bg-card p-8 py-12 text-center
-                  "
-                >
-                  <div
-                    className="
-                      mb-3 rounded-full bg-muted p-3 text-muted-foreground
-                    "
-                  >
-                    <Activity className="size-6" />
-                  </div>
-                  <p className="text-sm font-medium text-foreground">
-                    Welcome to your new workspace!
-                  </p>
-                  <p className="mt-1 mb-4 max-w-sm text-xs text-muted-foreground">
-                    Get started by creating a pipeline, tracking a new contact,
-                    or scheduling your first operational activity.
-                  </p>
-                  <Link
-                    href="/contacts?new=true"
-                    className="
-                      inline-flex items-center justify-center rounded-md
-                      bg-primary px-4 py-2 text-xs font-medium
-                      text-primary-foreground shadow-sm transition-colors
-                      hover:bg-primary/90
-                    "
-                  >
-                    <Plus className="mr-1.5 size-3.5" />
-                    Create Your First Contact
-                  </Link>
-                </div>
-              ) : (
-                rawRecentActivities.map((act) => (
-                  <div
-                    key={act.id}
-                    className="
-                      flex items-center gap-4 bg-card p-4 transition-colors
-                      hover:bg-accent/10
-                    "
-                  >
-                    <div
-                      className={`
-                        shrink-0 rounded-md border px-2 py-1 text-[10px]
-                        font-bold tracking-wider transition-colors select-none
-                        ${getActivityBadgeStyles(act.type)}
-                      `}
-                    >
-                      {act.type}
-                    </div>
 
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <p
-                          className="
-                            truncate text-sm font-semibold text-foreground/90
-                          "
-                        >
-                          {act.subject}
-                        </p>
-                        <span
-                          className="
-                            flex shrink-0 items-center gap-1 font-mono text-xs
-                            text-muted-foreground
-                          "
-                        >
-                          <Clock className="size-3" />
-                          {act.startDate.toLocaleDateString('en-NZ', {
-                            day: 'numeric',
-                            month: 'short',
-                          })}
-                        </span>
+            <Suspense
+              fallback={
+                <Card className="divide-y divide-border/50 overflow-hidden">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="flex animate-pulse items-center gap-4 p-4"
+                    >
+                      <div className="h-6 w-14 rounded-sm bg-muted" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-1/3 rounded-sm bg-muted" />
+                        <div className="h-3 w-1/4 rounded-sm bg-muted" />
                       </div>
-                      <p
-                        className="
-                          truncate pt-0.5 text-xs text-muted-foreground
-                        "
-                      >
-                        {act.contactPerson
-                          ? `Contact: ${act.contactPerson.name}`
-                          : 'No associated contact'}
-                      </p>
                     </div>
-                  </div>
-                ))
-              )}
-            </Card>
+                  ))}
+                </Card>
+              }
+            >
+              <RecentActivityStream userId={userId} />
+            </Suspense>
           </div>
 
+          {/* Quick Shortcuts (Instantly Active!) */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold tracking-tight">
               Quick Shortcuts
@@ -436,6 +350,6 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
-    </div>
+    </CRMPageShell>
   );
 }
