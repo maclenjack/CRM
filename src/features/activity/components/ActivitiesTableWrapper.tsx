@@ -11,7 +11,7 @@ import {
 } from '@/features/activity/activity';
 import { createActivity } from '@/features/activity/activity.actions';
 import { ActivitiesTable } from '@/features/activity/components/ActivitiesTable';
-import { AddActivityModal } from '@/features/activity/components/AddActivityModal';
+import { ActivityModal } from '@/features/activity/components/ActivityModal';
 import prisma from '@/lib/prisma';
 
 export async function ActivitiesTableWrapper() {
@@ -32,7 +32,7 @@ export async function ActivitiesTableWrapper() {
         icon={LayoutListIcon}
         action={
           <ModalButton
-            modalComponent={AddActivityModal}
+            modalComponent={ActivityModal}
             modalProps={{ onSubmitSuccess: createActivity }}
             asChild
           >
