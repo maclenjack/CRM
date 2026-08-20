@@ -28,11 +28,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { cn } from '@/features/shared/utils/cn';
 import {
   PINNED_CURRENCY_OPTIONS,
   REMAINING_CURRENCY_OPTIONS,
-} from '@/features/deal/deal.validation';
-import { cn } from '@/features/shared/utils/cn';
+} from '@/features/shared/utils/currency';
 
 interface CurrencyFieldProps<
   TFieldValues extends FieldValues,

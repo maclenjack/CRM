@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { Check, ChevronsUpDown, Loader2, X } from 'lucide-react';
+import { Check, ChevronsUpDown, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/popover';
 import { cn } from '@/features/shared/utils/cn';
 
-interface ComboboxOption {
+export interface ComboboxOption {
   value: string;
   label: string;
   description?: string | null;
