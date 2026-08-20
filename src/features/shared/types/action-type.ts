@@ -1,18 +1,25 @@
+import type { $ZodErrorTree } from 'zod/v4/core';
+
 export interface BaseActionResult {
   success: boolean;
 }
 
-export interface ErrorActionResult extends BaseActionResult {
+export type SuccessActionResult<TData = { id: string }> = [TData] extends [void]
+  ? {
+      success: true;
+      data?: undefined;
+    }
+  : {
+      success: true;
+      data: TData;
+    };
+
+export interface ErrorActionResult<TInput = unknown> extends BaseActionResult {
   success: false;
   error?: string;
-  validationErrors?: Record<string, string[]>;
+  validationErrors?: $ZodErrorTree<TInput>;
 }
 
-export interface SuccessActionResult<T = undefined> extends BaseActionResult {
-  success: true;
-  data?: T;
-}
-
-export type ActionResult<T = undefined> =
-  | SuccessActionResult<T>
-  | ErrorActionResult;
+export type ActionResult<TInput = unknown, TData = { id: string }> =
+  | SuccessActionResult<TData>
+  | ErrorActionResult<TInput>;
