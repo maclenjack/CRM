@@ -13,7 +13,12 @@ import { Input } from '@/components/ui/input';
 import {
   PINNED_CURRENCY_OPTIONS,
   REMAINING_CURRENCY_OPTIONS,
-} from '@/features/deal/deal.validation';
+} from '@/features/shared/utils/currency';
+
+const ALL_CURRENCIES = [
+  ...PINNED_CURRENCY_OPTIONS,
+  ...REMAINING_CURRENCY_OPTIONS,
+];
 
 interface DealAmountFieldProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
@@ -37,11 +42,7 @@ export function DealAmountField<TFieldValues extends FieldValues>({
     name: currencyFieldName,
   });
 
-  const allCurrencies = [
-    ...PINNED_CURRENCY_OPTIONS,
-    ...REMAINING_CURRENCY_OPTIONS,
-  ];
-  const activeCurrency = allCurrencies.find(
+  const activeCurrency = ALL_CURRENCIES.find(
     (c) => c.value === selectedCurrencyCode
   );
   const currencySymbol = activeCurrency?.symbol || '$';
@@ -66,22 +67,39 @@ export function DealAmountField<TFieldValues extends FieldValues>({
               {currencySymbol}
             </span>
             <Input
-              {...field}
               id={name}
-              type="number"
+              type="text"
+              inputMode="decimal"
               placeholder={placeholder}
               className="
-                h-9 rounded-l-none border pl-12 shadow-none
-                focus-visible:ring-0
+                h-9 border pl-9 shadow-none
+                focus-visible:ring-1
               "
-              value={field.value === 0 ? '' : (field.value ?? '')}
+              value={field.value ?? ''}
               aria-invalid={!!fieldState.error}
               onChange={(e) => {
                 const val = e.target.value;
+
                 if (val === '') {
-                  field.onChange(0);
-                } else {
-                  field.onChange(Number(val));
+                  field.onChange('');
+                  return;
+                }
+
+                // Allow digits, 1 decimal point, and up to 2 decimal places while typing
+                if (/^\d*\.?\d{0,2}$/.test(val)) {
+                  field.onChange(val);
+                }
+              }}
+              onBlur={() => {
+                field.onBlur();
+
+                // Format to 2 decimal places when leaving the field
+                if (field.value && !isNaN(Number(field.value))) {
+                  const formatted = Number(field.value).toFixed(2);
+                  field.onChange(formatted);
+                } else if (field.value === '') {
+                  // Ensure empty string maps to '0' for Prisma Decimal
+                  field.onChange('0');
                 }
               }}
             />
