@@ -74,9 +74,11 @@ export function KanbanColumn<T extends KanbanCardData>({
 
       <CardContent className="flex flex-1 flex-col gap-3 overflow-y-auto p-2 pt-1">
         <SortableContext items={cardIds} strategy={verticalListSortingStrategy}>
-          {cards.map((card) => (
-            <KanbanCard key={card.id} card={card} renderCard={renderCard} />
-          ))}
+          {cards
+            .sort((a, b) => b.position - a.position)
+            .map((card) => (
+              <KanbanCard key={card.id} card={card} renderCard={renderCard} />
+            ))}
 
           {cards.length === 0 && (
             <div
