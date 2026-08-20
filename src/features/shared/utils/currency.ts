@@ -1,5 +1,3 @@
-// features/shared/utils/currency.ts
-
 const currencySymbolCache = new Map<string, string>();
 
 /**
@@ -43,8 +41,6 @@ export function formatCurrency(
     currency: currencyCode,
   }).format(numericAmount);
 }
-
-// features/shared/utils/currency.ts
 
 export interface CurrencyOption {
   value: string;

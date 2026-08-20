@@ -37,7 +37,7 @@ export async function registerUser(data: z.infer<typeof registerSchema>) {
         name,
         email,
         hashedPassword: passwordHash,
-        role: 'user',
+        role: 'USER',
       },
     });
   } catch (error) {

@@ -1,6 +1,5 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 
-import convertDecimalsToStrings from '@/features/shared/utils/convert-decimals-to-strings';
 import { PrismaClient } from '@/generated/prisma/client';
 
 const softDeleteModels = [
@@ -41,8 +40,17 @@ const prismaClientSingleton = () => {
               };
             }
           }
-          const result = await query(args);
-          return convertDecimalsToStrings(result);
+          return query(args);
+        },
+      },
+    },
+    result: {
+      deal: {
+        numericValue: {
+          needs: { value: true },
+          compute(deal) {
+            return deal.value.toNumber();
+          },
         },
       },
     },

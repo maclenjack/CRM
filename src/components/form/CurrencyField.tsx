@@ -100,7 +100,6 @@ export function CurrencyField<
                 <CommandList>
                   <CommandEmpty>No currency found.</CommandEmpty>
 
-                  {/* Pinned Group */}
                   <CommandGroup heading="Pinned">
                     {PINNED_CURRENCY_OPTIONS.map((currency) => (
                       <CommandItem
@@ -137,7 +136,6 @@ export function CurrencyField<
 
                   <CommandSeparator />
 
-                  {/* All Currencies Group */}
                   <CommandGroup heading="All Currencies">
                     {REMAINING_CURRENCY_OPTIONS.map((currency) => (
                       <CommandItem
