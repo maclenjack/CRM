@@ -1,4 +1,5 @@
 import {
+  type CountryCode,
   isPossiblePhoneNumber,
   parsePhoneNumberFromString,
 } from 'libphonenumber-js';
@@ -22,7 +23,10 @@ const phoneItemSchema = z
       return;
     }
 
-    const possible = isPossiblePhoneNumber(data.value, data.countryCode as any);
+    const possible = isPossiblePhoneNumber(
+      data.value,
+      data.countryCode as CountryCode
+    );
     if (!possible) {
       ctx.addIssue({
         code: 'custom',
@@ -34,7 +38,7 @@ const phoneItemSchema = z
 
     const phoneNumber = parsePhoneNumberFromString(
       data.value,
-      data.countryCode as any
+      data.countryCode as CountryCode
     );
     if (!phoneNumber || !phoneNumber.isValid()) {
       ctx.addIssue({
@@ -47,7 +51,7 @@ const phoneItemSchema = z
   .transform((data) => {
     const phoneNumber = parsePhoneNumberFromString(
       data.value,
-      data.countryCode as any
+      data.countryCode as CountryCode
     );
 
     return {
@@ -71,9 +75,14 @@ export const PersonFormSchema = z.object({
     .trim()
     .min(1, 'Name is required')
     .max(70, 'Name cannot exceed 70 characters'),
-  organizationId: z.string().trim().optional().or(z.literal('')),
+  organizationId: z.string().nullable().optional(),
   phones: z.array(phoneItemSchema),
   emails: z.array(emailItemSchema),
 });
 
+export const DeletePersonSchema = z.object({
+  id: z.cuid2('Invalid Person ID').trim(),
+});
+
 export type PersonFormValues = z.infer<typeof PersonFormSchema>;
+export type DeletePersonInput = z.infer<typeof DeletePersonSchema>;
