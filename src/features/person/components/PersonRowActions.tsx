@@ -15,10 +15,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { PersonModal } from '@/features/person/components/PersonModal';
 import type { PersonTableSelect } from '@/features/person/person';
-import {
-  getPersonInitialValues,
-  usePersonActions,
-} from '@/features/person/person.utils';
+import { usePersonActions } from '@/features/person/person.hooks';
+import { getPersonInitialValues } from '@/features/person/person.utils';
 
 interface PersonRowActionsProps {
   person: PersonTableSelect;
