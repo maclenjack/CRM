@@ -1,6 +1,12 @@
 'use client';
 
-import { Controller, type Path, useFieldArray, useForm } from 'react-hook-form';
+import {
+  Controller,
+  FormProvider,
+  type Path,
+  useFieldArray,
+  useForm,
+} from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PlusIcon, UserIcon } from 'lucide-react';
@@ -132,155 +138,156 @@ export function PersonModal({
             {isEditing ? 'Edit Person' : 'Add Person'}
           </DialogTitle>
         </DialogHeader>
+        <FormProvider {...formMethods}>
+          <form className="space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
+            <div className="space-y-4">
+              <PersonNameField control={control} name="name" required />
 
-        <form className="space-y-6" onSubmit={handleSubmit(handleFormSubmit)}>
-          <div className="space-y-4">
-            <PersonNameField control={control} name="name" required />
+              <div className="space-y-1.5">
+                <Controller
+                  control={control}
+                  name="organizationId"
+                  render={({ field, fieldState }) => (
+                    <AsyncCombobox
+                      value={field.value ?? null}
+                      initialLabel={initialData?.organizationName ?? ''}
+                      onChange={field.onChange}
+                      error={fieldState.error?.message}
+                      label="Associated Organization"
+                      placeholder="Select an organization..."
+                      searchPlaceholder="Type company name..."
+                      fetchOptions={searchOrganizations}
+                      mapOption={mapOrganizationToOption}
+                    />
+                  )}
+                />
+              </div>
+            </div>
 
-            <div className="space-y-1.5">
-              <Controller
-                control={control}
-                name="organizationId"
-                render={({ field, fieldState }) => (
-                  <AsyncCombobox
-                    value={field.value ?? null}
-                    initialLabel={initialData?.organizationName ?? ''}
-                    onChange={field.onChange}
-                    error={fieldState.error?.message}
-                    label="Associated Organization"
-                    placeholder="Select an organization..."
-                    searchPlaceholder="Type company name..."
-                    fetchOptions={searchOrganizations}
-                    mapOption={mapOrganizationToOption}
-                  />
+            <div className="space-y-5 border-t border-border/40 pt-4">
+              <div className="space-y-3">
+                <span
+                  className="
+                    block text-[11px] font-bold tracking-wide
+                    text-muted-foreground/70 uppercase select-none
+                  "
+                >
+                  Phones
+                </span>
+
+                {phoneFields.length > 0 && (
+                  <div className="space-y-2.5">
+                    {phoneFields.map((item, index) => (
+                      <PersonPhoneField
+                        key={item.id}
+                        control={control}
+                        name={
+                          `phones.${index}` as Path<
+                            z.input<typeof PersonFormSchema>
+                          >
+                        }
+                        index={index}
+                        onRemove={removePhone}
+                        disabled={isSubmitting}
+                      />
+                    ))}
+                  </div>
                 )}
-              />
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={isSubmitting}
+                  className="
+                    h-8 gap-1.5 border-dashed border-border/80 px-3 text-xs
+                    font-medium text-muted-foreground shadow-xs transition-all
+                    hover:bg-muted/50 hover:text-foreground
+                  "
+                  onClick={() =>
+                    addPhone({
+                      value: '',
+                      type: ContactCategory.WORK,
+                      countryCode: 'NZ',
+                    })
+                  }
+                >
+                  <PlusIcon className="size-3.5" />
+                  Add Phone
+                </Button>
+              </div>
+
+              <div className="space-y-3">
+                <span
+                  className="
+                    block text-[11px] font-bold tracking-wide
+                    text-muted-foreground/70 uppercase select-none
+                  "
+                >
+                  Emails
+                </span>
+
+                {emailFields.length > 0 && (
+                  <div className="space-y-2.5">
+                    {emailFields.map((item, index) => (
+                      <PersonEmailField
+                        key={item.id}
+                        control={control}
+                        name={
+                          `emails.${index}` as Path<
+                            z.input<typeof PersonFormSchema>
+                          >
+                        }
+                        index={index}
+                        onRemove={removeEmail}
+                        disabled={isSubmitting}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={isSubmitting}
+                  className="
+                    h-8 gap-1.5 border-dashed border-border/80 px-3 text-xs
+                    font-medium text-muted-foreground shadow-xs transition-all
+                    hover:bg-muted/50 hover:text-foreground
+                  "
+                  onClick={() =>
+                    addEmail({ value: '', type: ContactCategory.WORK })
+                  }
+                >
+                  <PlusIcon className="size-3.5" />
+                  Add Email
+                </Button>
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-5 border-t border-border/40 pt-4">
-            <div className="space-y-3">
-              <span
-                className="
-                  block text-[11px] font-bold tracking-wide
-                  text-muted-foreground/70 uppercase select-none
-                "
-              >
-                Phones
-              </span>
-
-              {phoneFields.length > 0 && (
-                <div className="space-y-2.5">
-                  {phoneFields.map((item, index) => (
-                    <PersonPhoneField
-                      key={item.id}
-                      control={control}
-                      name={
-                        `phones.${index}` as Path<
-                          z.input<typeof PersonFormSchema>
-                        >
-                      }
-                      index={index}
-                      onRemove={removePhone}
-                      disabled={isSubmitting}
-                    />
-                  ))}
-                </div>
-              )}
-
+            <DialogFooter className="gap-2 border-t border-border/40 pt-4 sm:gap-0">
               <Button
-                type="button"
                 variant="outline"
+                type="button"
                 size="sm"
+                className="h-9 px-4 font-medium"
+                onClick={onClose}
                 disabled={isSubmitting}
-                className="
-                  h-8 gap-1.5 border-dashed border-border/80 px-3 text-xs
-                  font-medium text-muted-foreground shadow-xs transition-all
-                  hover:bg-muted/50 hover:text-foreground
-                "
-                onClick={() =>
-                  addPhone({
-                    value: '',
-                    type: ContactCategory.WORK,
-                    countryCode: 'US',
-                  })
-                }
               >
-                <PlusIcon className="size-3.5" />
-                Add Phone
+                Cancel
               </Button>
-            </div>
-
-            <div className="space-y-3">
-              <span
-                className="
-                  block text-[11px] font-bold tracking-wide
-                  text-muted-foreground/70 uppercase select-none
-                "
-              >
-                Emails
-              </span>
-
-              {emailFields.length > 0 && (
-                <div className="space-y-2.5">
-                  {emailFields.map((item, index) => (
-                    <PersonEmailField
-                      key={item.id}
-                      control={control}
-                      name={
-                        `emails.${index}` as Path<
-                          z.input<typeof PersonFormSchema>
-                        >
-                      }
-                      index={index}
-                      onRemove={removeEmail}
-                      disabled={isSubmitting}
-                    />
-                  ))}
-                </div>
-              )}
-
               <Button
-                type="button"
-                variant="outline"
+                type="submit"
                 size="sm"
+                className="h-9 px-4 font-medium shadow-xs"
                 disabled={isSubmitting}
-                className="
-                  h-8 gap-1.5 border-dashed border-border/80 px-3 text-xs
-                  font-medium text-muted-foreground shadow-xs transition-all
-                  hover:bg-muted/50 hover:text-foreground
-                "
-                onClick={() =>
-                  addEmail({ value: '', type: ContactCategory.WORK })
-                }
               >
-                <PlusIcon className="size-3.5" />
-                Add Email
+                {getSubmitButtonLabel()}
               </Button>
-            </div>
-          </div>
-
-          <DialogFooter className="gap-2 border-t border-border/40 pt-4 sm:gap-0">
-            <Button
-              variant="outline"
-              type="button"
-              size="sm"
-              className="h-9 px-4 font-medium"
-              onClick={onClose}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              size="sm"
-              className="h-9 px-4 font-medium shadow-xs"
-              disabled={isSubmitting}
-            >
-              {getSubmitButtonLabel()}
-            </Button>
-          </DialogFooter>
-        </form>
+            </DialogFooter>
+          </form>
+        </FormProvider>
       </DialogContent>
     </Dialog>
   );

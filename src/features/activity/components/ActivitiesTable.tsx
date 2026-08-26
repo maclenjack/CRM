@@ -1,7 +1,6 @@
 'use client';
 
 import { createColumnHelper } from '@tanstack/react-table';
-import { ClipboardList, Mail, Phone, Users } from 'lucide-react';
 import z from 'zod';
 
 import { AsyncCombobox } from '@/components/form/AsyncCombobox';
@@ -32,25 +31,8 @@ import { PriorityBadge } from '@/features/priority-level/components/PriorityBadg
 import { PriorityLevel } from '@/features/priority-level/priority-level';
 import { formatDuration } from '@/features/shared/utils/date';
 import { PriorityLevel as PrismaPriorityLevel } from '@/generated/prisma/enums';
-import { ActivityType } from '@/generated/prisma/enums';
 
 const columnHelper = createColumnHelper<ActivityTableSelect>();
-
-const ActivityIcon = ({ type }: { type: string }) => {
-  const iconProps = { className: 'size-4 text-muted-foreground' };
-  switch (type) {
-    case 'CALL':
-      return <Phone {...iconProps} />;
-    case 'EMAIL':
-      return <Mail {...iconProps} />;
-    case 'MEETING':
-      return <Users {...iconProps} />;
-    case 'TASK':
-      return <ClipboardList {...iconProps} />;
-    default:
-      return <ClipboardList {...iconProps} />;
-  }
-};
 
 const columns = [
   columnHelper.display({
@@ -63,18 +45,11 @@ const columns = [
       />
     ),
   }),
-  columnHelper.accessor('type', {
-    header: 'Type',
-    enableSorting: true,
-    cell: (info) => (
-      <ActivityTypeBadge type={info.getValue() as ActivityType} />
-    ),
-  }),
   columnHelper.accessor('subject', {
     header: 'Subject',
     cell: (info) => (
       <div className="flex w-full items-center gap-2">
-        <ActivityIcon type={info.row.original.type} />
+        <ActivityTypeBadge type={info.row.original.type} />
 
         <CellEditor
           label="Subject"
@@ -286,7 +261,7 @@ const columns = [
     header: 'Due Date',
     sortingFn: 'datetime',
     cell: (startDate) =>
-      startDate.getValue().toLocaleDateString('en-US', {
+      startDate.getValue().toLocaleDateString('en-NZ', {
         month: 'short',
         day: 'numeric',
         hour: 'numeric',

@@ -44,7 +44,7 @@ export function ActivityDateTimeField<TFieldValues extends FieldValues>({
             placeholder={placeholder}
             aria-invalid={!!fieldState.error}
           />
-          <FieldError />
+          <FieldError errors={[fieldState.error]} />
         </Field>
       )}
     />

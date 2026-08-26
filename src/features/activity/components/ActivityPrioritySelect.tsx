@@ -16,14 +16,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PriorityBadge } from '@/features/priority-level/components/PriorityBadge';
+import { PriorityLevel } from '@/features/priority-level/priority-level';
 import { cn } from '@/features/shared/utils/cn';
-import { PriorityLevel } from '@/generated/prisma/enums';
-
-const PRIORITY_LABELS: Record<PriorityLevel, string> = {
-  LOW: 'Low',
-  MEDIUM: 'Medium',
-  HIGH: 'High',
-};
 
 interface ActivityPrioritySelectProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
@@ -40,8 +34,6 @@ export function ActivityPrioritySelect<TFieldValues extends FieldValues>({
   required = false,
   placeholder = 'Select priority',
 }: ActivityPrioritySelectProps<TFieldValues>) {
-  const priorities = Object.keys(PRIORITY_LABELS) as PriorityLevel[];
-
   return (
     <Controller<TFieldValues>
       control={control}
@@ -52,7 +44,6 @@ export function ActivityPrioritySelect<TFieldValues extends FieldValues>({
             <FieldLabel htmlFor={name} required={required}>
               {label}
             </FieldLabel>
-            {field.value && <PriorityBadge priorityLevel={field.value} />}
           </div>
           <Select
             onValueChange={field.onChange}
@@ -73,17 +64,17 @@ export function ActivityPrioritySelect<TFieldValues extends FieldValues>({
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>
-              {priorities.map((priority) => (
-                <SelectItem key={priority} value={priority}>
+              {PriorityLevel.values().map(({ label, value }) => (
+                <SelectItem key={label} value={value}>
                   <span className="flex items-center gap-2">
-                    <PriorityBadge priorityLevel={priority} />
-                    {PRIORITY_LABELS[priority]}
+                    <PriorityBadge priorityLevel={value} />
+                    {label}
                   </span>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <FieldError />
+          <FieldError errors={[fieldState.error]} />
         </Field>
       )}
     />

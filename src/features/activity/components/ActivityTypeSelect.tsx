@@ -15,26 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { ActivityType } from '@/features/activity/activity-type';
 import { cn } from '@/features/shared/utils/cn';
-import { ActivityType } from '@/generated/prisma/enums';
-
-const TYPE_LABELS: Record<ActivityType, string> = {
-  CALL: 'Call',
-  EMAIL: 'Email',
-  MEETING: 'Meeting',
-  TASK: 'Task',
-  DEADLINE: 'Deadline',
-  LUNCH: 'Lunch',
-} as const;
-
-const TYPE_ICONS: Record<ActivityType, string> = {
-  CALL: '📞',
-  EMAIL: '✉️',
-  MEETING: '👥',
-  TASK: '📋',
-  DEADLINE: '⚠️',
-  LUNCH: '🍽️',
-} as const;
 
 interface ActivityTypeSelectProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;
@@ -51,8 +33,6 @@ export function ActivityTypeSelect<TFieldValues extends FieldValues>({
   required = false,
   placeholder = 'Select type',
 }: ActivityTypeSelectProps<TFieldValues>) {
-  const types = Object.keys(TYPE_LABELS) as ActivityType[];
-
   return (
     <Controller<TFieldValues>
       control={control}
@@ -81,17 +61,17 @@ export function ActivityTypeSelect<TFieldValues extends FieldValues>({
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>
-              {types.map((type) => (
-                <SelectItem key={type} value={type}>
+              {ActivityType.values().map(({ label, value, icon: Icon }) => (
+                <SelectItem key={label} value={value}>
                   <span className="flex items-center gap-2">
-                    <span>{TYPE_ICONS[type]}</span>
-                    {TYPE_LABELS[type]}
+                    <Icon />
+                    {label}
                   </span>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <FieldError />
+          <FieldError errors={[fieldState.error]} />
         </Field>
       )}
     />

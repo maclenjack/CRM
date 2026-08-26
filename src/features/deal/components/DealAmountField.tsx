@@ -98,14 +98,13 @@ export function DealAmountField<TFieldValues extends FieldValues>({
                   const formatted = Number(field.value).toFixed(2);
                   field.onChange(formatted);
                 } else if (field.value === '') {
-                  // Ensure empty string maps to '0' for Prisma Decimal
                   field.onChange('0');
                 }
               }}
             />
           </div>
 
-          <FieldError />
+          <FieldError errors={[fieldState.error]} />
         </Field>
       )}
     />

@@ -65,7 +65,7 @@ export function CurrencyField<
     <Controller<TFieldValues, TName>
       control={control}
       name={name}
-      render={({ field }) => (
+      render={({ field, fieldState }) => (
         <Field className={cn('flex flex-col gap-2', className)}>
           <FieldLabel required>{label}</FieldLabel>
 
@@ -174,7 +174,7 @@ export function CurrencyField<
             </PopoverContent>
           </Popover>
 
-          <FieldError />
+          <FieldError errors={[fieldState.error]} />
         </Field>
       )}
     />

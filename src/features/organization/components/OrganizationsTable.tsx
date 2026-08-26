@@ -114,7 +114,7 @@ const columns = [
           "
         >
           <CalendarIcon className="size-3.5 text-muted-foreground" />
-          {date.toLocaleDateString('en-US', {
+          {date.toLocaleDateString('en-NZ', {
             year: 'numeric',
             month: 'short',
             day: 'numeric',

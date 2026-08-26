@@ -46,7 +46,7 @@ export function OrganizationNameField<TFieldValues extends FieldValues>({
             onChange={(e) => field.onChange(e.target.value)}
             onBlur={field.onBlur}
           />
-          <FieldError />
+          <FieldError errors={[fieldState.error]} />
         </Field>
       )}
     />

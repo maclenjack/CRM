@@ -1,37 +1,17 @@
 'use client';
 
-import {
-  AlertTriangle,
-  ClipboardList,
-  Mail,
-  Phone,
-  Users,
-  Utensils,
-} from 'lucide-react';
-
+import { ActivityType } from '@/features/activity/activity-type';
 import { getActivityBadgeStyles } from '@/features/activity/utils/styles';
 import { cn } from '@/features/shared/utils/cn';
-import { ActivityType } from '@/generated/prisma/enums';
+import { ActivityType as PrismaActivityType } from '@/generated/prisma/enums';
 
 interface ActivityTypeBadgeProps {
-  type: ActivityType;
+  type: PrismaActivityType;
   className?: string;
 }
 
-const ICON_MAP: Record<
-  ActivityType,
-  React.ComponentType<{ className?: string }>
-> = {
-  CALL: Phone,
-  EMAIL: Mail,
-  MEETING: Users,
-  TASK: ClipboardList,
-  DEADLINE: AlertTriangle,
-  LUNCH: Utensils,
-};
-
 export function ActivityTypeBadge({ type, className }: ActivityTypeBadgeProps) {
-  const Icon = ICON_MAP[type] ?? ClipboardList;
+  const Icon = ActivityType.fromValue(type).icon;
   const baseStyles = getActivityBadgeStyles(type);
 
   return (

@@ -92,7 +92,7 @@ export function SignInForm() {
                       field.onChange(cleanValue);
                     }}
                   />
-                  <FieldError>{fieldState.error?.message}</FieldError>
+                  <FieldError errors={[fieldState.error]} />
                 </Field>
               )}
             />
@@ -134,7 +134,7 @@ export function SignInForm() {
                 <Link
                   href="/register"
                   className="
-                    text-primary-600
+                    text-primary
                     hover:underline
                   "
                 >
