@@ -2,55 +2,114 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { auth } from '@/auth';
-import type { PersonFormValues } from '@/features/person/person.validation';
+import {
+  DeletePersonSchema,
+  PersonFormSchema,
+} from '@/features/person/person.validation';
+import { actionPipeline } from '@/features/shared/actions/action-pipeline';
 import { createSearchAction } from '@/features/shared/actions/search-factory';
-import type { PersonModel } from '@/generated/prisma/models';
 import prisma from '@/lib/prisma';
 
-export async function createPersonAction(data: PersonFormValues) {
-  const session = await auth();
+const PEOPLE_PATH = '/contacts/people';
 
-  if (!session?.user?.id) {
-    return { success: false, error: 'Unauthorized: You must be logged in.' };
-  }
+export async function createPerson(rawInput: unknown) {
+  return actionPipeline({
+    schema: PersonFormSchema,
+    rawInput,
+    actionName: 'CreatePerson',
+    handler: async (data, userId) => {
+      const phones = data.phones.filter((p) => p.value.trim() !== '');
+      const emails = data.emails.filter((e) => e.value.trim() !== '');
 
-  console.log('creating person');
-
-  const phones = data.phones.filter((p) => p.value.trim() !== '');
-  const emails = data.emails.filter((e) => e.value.trim() !== '');
-
-  try {
-    await prisma.person.create({
-      data: {
-        name: data.name,
-        organizationId: data.organizationId,
-        ownerId: session.user.id,
-        phones: {
-          create: phones.map((p) => ({ phone: p.value, category: p.type })),
+      const newPerson = await prisma.person.create({
+        data: {
+          name: data.name,
+          organizationId: data.organizationId || null,
+          ownerId: userId,
+          phones: {
+            create: phones.map((p) => ({ phone: p.value, category: p.type })),
+          },
+          emails: {
+            create: emails.map((e) => ({ email: e.value, category: e.type })),
+          },
+          createdById: userId,
         },
-        emails: {
-          create: emails.map((e) => ({ email: e.value, category: e.type })),
-        },
-        createdById: session.user.id,
-      },
-    });
+      });
 
-    revalidatePath('/contacts/people');
-
-    return { success: true };
-  } catch (err) {
-    console.error('Create person error', err);
-    return { success: false, message: 'Failed to create person' };
-  }
+      revalidatePath(PEOPLE_PATH);
+      return { id: newPerson.id };
+    },
+  });
 }
 
-export const searchPeople = createSearchAction<PersonModel>(prisma.person, {
+export async function updatePerson(personId: string, rawInput: unknown) {
+  return actionPipeline({
+    schema: PersonFormSchema,
+    rawInput,
+    actionName: 'UpdatePerson',
+    handler: async (data, userId) => {
+      const phones = data.phones.filter((p) => p.value.trim() !== '');
+      const emails = data.emails.filter((e) => e.value.trim() !== '');
+
+      await prisma.person.update({
+        where: { id: personId, ownerId: userId },
+        data: {
+          name: data.name,
+          organizationId: data.organizationId || null,
+          phones: {
+            deleteMany: {},
+            create: phones.map((p) => ({
+              phone: p.value,
+              category: p.type,
+            })),
+          },
+          emails: {
+            deleteMany: {},
+            create: emails.map((e) => ({
+              email: e.value,
+              category: e.type,
+            })),
+          },
+          updatedById: userId,
+        },
+      });
+
+      revalidatePath(PEOPLE_PATH);
+      revalidatePath('/activities');
+      return { id: personId };
+    },
+  });
+}
+
+export async function deletePerson(id: string) {
+  return actionPipeline({
+    schema: DeletePersonSchema,
+    rawInput: { id },
+    actionName: 'DeletePerson',
+    handler: async ({ id: personId }, userId) => {
+      await prisma.person.update({
+        where: { id: personId, ownerId: userId },
+        data: {
+          deletedAt: new Date(),
+          updatedById: userId,
+        },
+      });
+
+      revalidatePath(PEOPLE_PATH);
+      return { id: personId };
+    },
+  });
+}
+
+export const searchPeople = createSearchAction<
+  { id: string; name: string; emails: { email: string }[] },
+  typeof prisma.person
+>(prisma.person, {
   searchField: 'name',
   selectFields: {
     id: true,
     name: true,
     emails: { select: { email: true } },
-  } as any,
+  },
   limit: 15,
 });

@@ -5,7 +5,7 @@ import { EmptyState } from '@/components/EmptyState';
 import { ModalButton } from '@/components/ModalButton';
 import { RecordTableCard } from '@/components/RecordTableCard';
 import { Button } from '@/components/ui/button';
-import { AddOrganizationModal } from '@/features/organization/components/AddOrganizationModal';
+import { OrganizationModal } from '@/features/organization/components/OrganizationModal';
 import {
   type OrganizationTableSelect,
   organizationsTableSelect,
@@ -33,7 +33,7 @@ export async function OrganizationsTableWrapper() {
         icon={Building2Icon}
         action={
           <ModalButton
-            modalComponent={AddOrganizationModal}
+            modalComponent={OrganizationModal}
             modalProps={{ onSubmitSuccess: createOrganization }}
             asChild
           >

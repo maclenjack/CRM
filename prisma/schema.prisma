@@ -3,12 +3,6 @@ generator client {
   output   = "../src/generated/prisma"
 }
 
-generator zod {
-  provider         = "zod-prisma-types"
-  output           = "../src/generated/zod"
-  createInputTypes = true
-}
-
 datasource db {
   provider = "postgresql"
 }
@@ -17,7 +11,6 @@ datasource db {
 // ENUMS
 // ============================================================================
 
-// TODO: (OPTIONAL) Custom activity types. For now we can hardcode a default set of common activity types.
 enum ActivityType {
   CALL
   MEETING
@@ -39,7 +32,6 @@ enum DealStatus {
   LOST
 }
 
-// TODO: (OPTIONAL) Custom pipelines and pipeline stages. For now we can hardcode a default pipeline with fixed stages.
 enum PipelineStage {
   QUALIFIED
   CONTACT_MADE
@@ -55,8 +47,11 @@ enum ContactCategory {
   OTHER
 }
 
-// TODO: (OPTIONAL) Location management.
-// TODO: (OPTIONAL) Teams/Organisations and team-based/organisation-based permissions.
+enum Role {
+  ADMIN
+  MANAGER
+  USER
+}
 
 // ============================================================================
 // AUTHENTICATION (NextAuth)
@@ -69,7 +64,7 @@ model User {
   emailVerified  DateTime? @map("email_verified")
   image          String?
   hashedPassword String?
-  role           String    @default("user")
+  role           Role      @default(USER)
 
   accounts             Account[]
   sessions             Session[]
@@ -147,7 +142,6 @@ model Organization {
   owner   User   @relation("organizationOwner", fields: [ownerId], references: [id])
   ownerId String @map("owner_id")
 
-  // TODO: (Optional) Add address.
   people     Person[]
   deals      Deal[]
   activities Activity[]
@@ -159,9 +153,9 @@ model Organization {
   updatedBy   User?   @relation("organizationUpdatedBy", fields: [updatedById], references: [id])
   updatedById String? @map("updated_by_id")
 
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
   @@index([ownerId])
   @@index([createdAt])
@@ -187,8 +181,8 @@ model Note {
   updatedBy   User?   @relation("noteUpdatedBy", fields: [updatedById], references: [id])
   updatedById String? @map("updated_by_id")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([dealId])
   @@index([activityId])
@@ -210,8 +204,8 @@ model Label {
   updatedBy   User?   @relation("labelUpdatedBy", fields: [updatedById], references: [id])
   updatedById String? @map("updated_by_id")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([createdAt])
   @@map("labels")
@@ -240,9 +234,9 @@ model Person {
   updatedBy   User?   @relation("personUpdatedBy", fields: [updatedById], references: [id])
   updatedById String? @map("updated_by_id")
 
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
   @@index([organizationId])
   @@index([ownerId])
@@ -252,11 +246,12 @@ model Person {
 }
 
 model PersonEmail {
-  id       String          @id @default(cuid())
-  email    String
-  category ContactCategory @default(WORK)
-  person   Person          @relation(fields: [personId], references: [id], onDelete: Cascade)
-  personId String          @map("person_id")
+  id        String          @id @default(cuid())
+  email     String
+  category  ContactCategory @default(WORK)
+  isPrimary Boolean         @default(false) @map("is_primary")
+  person    Person          @relation(fields: [personId], references: [id], onDelete: Cascade)
+  personId  String          @map("person_id")
 
   @@unique([personId, email])
   @@index([email])
@@ -264,11 +259,12 @@ model PersonEmail {
 }
 
 model PersonPhone {
-  id       String          @id @default(cuid())
-  phone    String
-  category ContactCategory @default(WORK)
-  person   Person          @relation(fields: [personId], references: [id], onDelete: Cascade)
-  personId String          @map("person_id")
+  id        String          @id @default(cuid())
+  phone     String
+  category  ContactCategory @default(WORK)
+  isPrimary Boolean         @default(false) @map("is_primary")
+  person    Person          @relation(fields: [personId], references: [id], onDelete: Cascade)
+  personId  String          @map("person_id")
 
   @@unique([personId, phone])
   @@index([phone])
@@ -276,22 +272,24 @@ model PersonPhone {
 }
 
 model Deal {
-  id                String        @id @default(cuid())
-  title             String
-  value             Float         @default(0)
-  currency          String        @default("NZD")
-  stage             PipelineStage @default(QUALIFIED)
-  position          Float         @default(0)
-  status            DealStatus    @default(OPEN)
-  priority          PriorityLevel @default(MEDIUM)
-  notes             Note[]
-  labels            Label[]       @relation("DealLabels")
-  expectedCloseDate DateTime?
-  lostReason        String?
-  lastActivityDate  DateTime?
-  nextActivityDate  DateTime?
-  wonAt             DateTime?
-  lostAt            DateTime?
+  id       String        @id @default(cuid())
+  title    String
+  value    Decimal       @default(0) @db.Decimal(12, 2)
+  currency String        @default("NZD")
+  stage    PipelineStage @default(QUALIFIED)
+
+  position Float         @default(0)
+  status   DealStatus    @default(OPEN)
+  priority PriorityLevel @default(MEDIUM)
+  notes    Note[]
+  labels   Label[]       @relation("DealLabels")
+
+  expectedCloseDate DateTime? @map("expected_close_date")
+  lostReason        String?   @map("lost_reason")
+  lastActivityDate  DateTime? @map("last_activity_date")
+  nextActivityDate  DateTime? @map("next_activity_date")
+  wonAt             DateTime? @map("won_at")
+  lostAt            DateTime? @map("lost_at")
 
   owner   User   @relation("dealOwner", fields: [ownerId], references: [id])
   ownerId String @map("owner_id")
@@ -311,9 +309,9 @@ model Deal {
   updatedBy   User?   @relation("dealUpdatedBy", fields: [updatedById], references: [id])
   updatedById String? @map("updated_by_id")
 
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
   @@index([personId])
   @@index([organizationId])
@@ -326,6 +324,8 @@ model Deal {
   @@index([createdAt])
   @@index([updatedAt])
   @@index([deletedAt])
+  @@index([organizationId, status])
+  @@index([ownerId, stage, position])
   @@map("deals")
 }
 
@@ -333,10 +333,10 @@ model Activity {
   id          String        @id @default(cuid())
   subject     String
   type        ActivityType  @default(TASK)
-  done        Boolean       @default(false)
+  isDone      Boolean       @default(false) @map("is_done")
   priority    PriorityLevel @default(MEDIUM)
-  startDate   DateTime
-  endDate     DateTime
+  startDate   DateTime      @map("start_date")
+  endDate     DateTime      @map("end_date")
   description String?       @db.Text
   location    String?
 
@@ -359,9 +359,9 @@ model Activity {
   updatedBy   User?   @relation("activityUpdatedBy", fields: [updatedById], references: [id])
   updatedById String? @map("updated_by_id")
 
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map("deleted_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
 
   @@index([dealId])
   @@index([personId])
@@ -370,9 +370,10 @@ model Activity {
   @@index([type])
   @@index([startDate])
   @@index([endDate])
-  @@index([done])
+  @@index([isDone])
   @@index([createdAt])
   @@index([updatedAt])
   @@index([deletedAt])
+  @@index([ownerId, isDone])
   @@map("activities")
 }

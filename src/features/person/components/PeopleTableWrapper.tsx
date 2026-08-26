@@ -5,12 +5,12 @@ import { EmptyState } from '@/components/EmptyState';
 import { ModalButton } from '@/components/ModalButton';
 import { RecordTableCard } from '@/components/RecordTableCard';
 import { Button } from '@/components/ui/button';
-import { AddPersonModal } from '@/features/person/components/AddPersonModal';
+import { PersonModal } from '@/features/person/components/PersonModal';
 import {
   type PersonTableSelect,
   personTableSelect,
 } from '@/features/person/person';
-import { createPersonAction } from '@/features/person/person.actions';
+import { createPerson } from '@/features/person/person.actions';
 import prisma from '@/lib/prisma';
 
 import { PeopleTable } from './PeopleTable';
@@ -32,8 +32,8 @@ export async function PeopleTableWrapper() {
         icon={UserIcon}
         action={
           <ModalButton
-            modalComponent={AddPersonModal}
-            modalProps={{ onSubmitSuccess: createPersonAction }}
+            modalComponent={PersonModal}
+            modalProps={{ onSubmitSuccess: createPerson }}
             asChild
           >
             <Button

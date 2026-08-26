@@ -4,16 +4,13 @@ import { auth } from '@/auth';
 import { EmptyState } from '@/components/EmptyState';
 import { ModalButton } from '@/components/ModalButton';
 import { Button } from '@/components/ui/button';
-import { AddDealModal } from '@/features/deal/components/AddDealModal';
 import { DealKanbanClient } from '@/features/deal/components/DealKanbanClient';
+import { DealModal } from '@/features/deal/components/DealModal';
 import {
   type DealKanbanCard,
   dealKanbanCardSelect,
 } from '@/features/deal/deal';
-import {
-  createDeal,
-  updateDealStageAction,
-} from '@/features/deal/deal.actions';
+import { createDeal, updateDealStage } from '@/features/deal/deal.actions';
 import { PipelineStage } from '@/features/deal/pipeline-stage';
 import type { MoveCardInput } from '@/features/kanban-board/kanban-board.validation';
 import prisma from '@/lib/prisma';
@@ -22,11 +19,16 @@ export async function DealKanbanWrapper() {
   const session = await auth();
   if (!session?.user) return null;
 
-  const deals: DealKanbanCard[] = await prisma.deal.findMany({
-    where: { ownerId: session.user.id },
-    orderBy: { position: 'asc' },
-    select: dealKanbanCardSelect,
-  });
+  const deals: DealKanbanCard[] = (
+    await prisma.deal.findMany({
+      where: { ownerId: session.user.id },
+      orderBy: { position: 'asc' },
+      select: dealKanbanCardSelect,
+    })
+  ).map((deal) => ({
+    ...deal,
+    value: deal.value ? deal.value.toNumber() : 0,
+  }));
 
   if (deals.length === 0) {
     return (
@@ -36,7 +38,7 @@ export async function DealKanbanWrapper() {
         icon={KanbanSquareIcon}
         action={
           <ModalButton
-            modalComponent={AddDealModal}
+            modalComponent={DealModal}
             modalProps={{ onSubmitSuccess: createDeal }}
             asChild
           >
@@ -68,7 +70,7 @@ export async function DealKanbanWrapper() {
 
   const handleCardMoved = async (payload: MoveCardInput) => {
     'use server';
-    return await updateDealStageAction(payload);
+    return await updateDealStage(payload);
   };
 
   return (

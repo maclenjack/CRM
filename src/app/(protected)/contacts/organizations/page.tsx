@@ -6,7 +6,7 @@ import { CRMPageShell } from '@/components/CRMPageShell';
 import { ModalButton } from '@/components/ModalButton';
 import { TableLoadingPlaceholder } from '@/components/table/TableLoadingPlaceholder';
 import { Button } from '@/components/ui/button';
-import { AddOrganizationModal } from '@/features/organization/components/AddOrganizationModal';
+import { OrganizationModal } from '@/features/organization/components/OrganizationModal';
 import { OrganizationsTableWrapper } from '@/features/organization/components/OrganizationsTableWrapper';
 import { createOrganization } from '@/features/organization/organization.actions';
 
@@ -18,7 +18,7 @@ export default function OrganizationsPage() {
       icon={Building2Icon}
       actionButton={
         <ModalButton
-          modalComponent={AddOrganizationModal}
+          modalComponent={OrganizationModal}
           modalProps={{ onSubmitSuccess: createOrganization }}
           asChild
         >

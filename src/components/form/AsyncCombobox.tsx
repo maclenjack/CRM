@@ -1,14 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  type Control,
-  type FieldPath,
-  type FieldValues,
-  useController,
-} from 'react-hook-form';
 
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
+import { Check, ChevronsUpDown, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -27,60 +21,58 @@ import {
 } from '@/components/ui/popover';
 import { cn } from '@/features/shared/utils/cn';
 
-interface ComboboxOption {
+export interface ComboboxOption {
   value: string;
   label: string;
   description?: string | null;
 }
 
-interface AsyncComboboxProps<TFieldValues extends FieldValues, TData = any> {
-  control: Control<TFieldValues>;
-  name: FieldPath<TFieldValues>;
-  label: string;
+interface AsyncComboboxProps<TData = any> {
+  value: string | null | undefined;
+  initialLabel?: string;
+  onChange: (value: string | null) => void;
+  error?: string;
+  label?: string;
   placeholder: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
   required?: boolean;
+  disabled?: boolean;
   fetchOptions: (
     query: string
   ) => Promise<{ success: boolean; data?: TData[] }>;
-  mapOption: (item: TData) => {
-    value: string;
-    label: string;
-    description?: string | null;
-  };
+  mapOption: (item: TData) => ComboboxOption;
 }
 
-export function AsyncCombobox<TFieldValues extends FieldValues>({
-  control,
-  name,
+export function AsyncCombobox<TData = any>({
+  value,
+  initialLabel = '',
+  onChange,
+  error,
   label,
   placeholder,
   searchPlaceholder = 'Search options...',
   emptyMessage = 'No results found.',
   required = false,
+  disabled = false,
   fetchOptions,
   mapOption,
-}: AsyncComboboxProps<TFieldValues>) {
+}: AsyncComboboxProps<TData>) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [options, setOptions] = useState<ComboboxOption[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedLabel, setSelectedLabel] = useState('');
 
-  const {
-    field: { value, onChange },
-    fieldState: { error },
-  } = useController({ name, control });
+  const [selectedLabel, setSelectedLabel] = useState(initialLabel);
+
+  useEffect(() => {
+    if (!value) {
+      setSelectedLabel('');
+    }
+  }, [value, initialLabel]);
 
   useEffect(() => {
     const currentQuery = searchQuery.trim();
-
     const loadOptions = async () => {
-      if (currentQuery.length >= 2) {
-        setIsLoading(true);
-      }
-
       try {
         const response = await fetchOptions(searchQuery);
         if (response.success && response.data) {
@@ -88,37 +80,34 @@ export function AsyncCombobox<TFieldValues extends FieldValues>({
         } else {
           setOptions([]);
         }
-      } catch (err) {
-        console.error(err);
+      } catch (error) {
+        console.error('Failed to execute operation:', error);
         setOptions([]);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     const isSearchState = currentQuery.length >= 2;
-
     const delayDebounceFn = setTimeout(
-      () => {
-        loadOptions();
-      },
+      () => loadOptions(),
       isSearchState ? 300 : 0
     );
-
     return () => clearTimeout(delayDebounceFn);
-  }, [searchQuery, fetchOptions]);
+  }, [searchQuery, fetchOptions, mapOption]);
 
   useEffect(() => {
-    if (!open) {
-      setSearchQuery('');
-    }
+    if (!open) setSearchQuery('');
   }, [open]);
 
   return (
     <div className="flex w-full flex-col gap-1.5">
-      <FieldLabel className="font-semibold text-slate-700" required={required}>
-        {label}
-      </FieldLabel>
+      {label && (
+        <FieldLabel
+          className="font-semibold text-slate-700"
+          required={required}
+        >
+          {label}
+        </FieldLabel>
+      )}
 
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
@@ -126,6 +115,7 @@ export function AsyncCombobox<TFieldValues extends FieldValues>({
             variant="outline"
             role="combobox"
             aria-expanded={open}
+            disabled={disabled}
             className={cn(
               'h-auto w-full justify-between py-2 text-left font-normal',
               !value && 'text-slate-400',
@@ -139,15 +129,34 @@ export function AsyncCombobox<TFieldValues extends FieldValues>({
             <span className="truncate">
               {value && selectedLabel ? selectedLabel : placeholder}
             </span>
-            <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+
+            <div className="flex shrink-0 items-center gap-1">
+              {value && !disabled && (
+                <span
+                  role="button"
+                  tabIndex={0}
+                  className="
+                    rounded-sm p-0.5 text-slate-400 transition-colors
+                    hover:bg-slate-200 hover:text-slate-700
+                  "
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onChange(null);
+                    setSelectedLabel('');
+                  }}
+                  title="Clear selection"
+                >
+                  <X className="size-3.5" />
+                </span>
+              )}
+
+              <ChevronsUpDown className="size-4 opacity-50" />
+            </div>
           </Button>
         </PopoverTrigger>
 
         <PopoverContent
-          className="
-            w-(--radix-popover-trigger-width) rounded-md border bg-white p-0
-            shadow-md
-          "
+          className="w-[--radix-popover-trigger-width] p-0"
           align="start"
         >
           <Command shouldFilter={false}>
@@ -157,44 +166,25 @@ export function AsyncCombobox<TFieldValues extends FieldValues>({
               onValueChange={setSearchQuery}
             />
             <CommandList>
-              {isLoading && (
-                <div
-                  className="
-                    flex items-center justify-center p-4 text-sm text-slate-500
-                  "
-                >
-                  <Loader2 className="mr-2 size-4 animate-spin text-slate-400" />
-                  Searching...
-                </div>
-              )}
-
-              {!isLoading && searchQuery.trim().length === 1 && (
+              {searchQuery.trim().length < 2 && (
                 <div
                   className="
                     border-b bg-slate-50 px-4 py-2 text-xs font-medium
                     text-slate-500 italic
                   "
                 >
-                  Showing recent items. Type 1 more character to search...
+                  Showing recent items. Type {2 - searchQuery.trim().length}{' '}
+                  more character to search...
                 </div>
               )}
 
-              {!isLoading &&
-                options.length === 0 &&
-                searchQuery.trim().length >= 2 && (
-                  <CommandEmpty className="py-6 text-center text-sm text-slate-500">
-                    {emptyMessage || 'No results found.'}
-                  </CommandEmpty>
-                )}
-
-              {!isLoading && options.length > 0 && (
-                <CommandGroup
-                  heading={
-                    searchQuery.trim().length < 2
-                      ? 'Recent Items'
-                      : 'Search Results'
-                  }
-                >
+              {options.length === 0 && searchQuery.trim().length >= 2 && (
+                <CommandEmpty className="py-6 text-center text-sm text-slate-500">
+                  {emptyMessage || 'No results found.'}
+                </CommandEmpty>
+              )}
+              {options.length > 0 && (
+                <CommandGroup>
                   {options.map((option) => (
                     <CommandItem
                       key={option.value}
@@ -232,9 +222,7 @@ export function AsyncCombobox<TFieldValues extends FieldValues>({
       </Popover>
 
       {error && (
-        <span className="text-xs font-medium text-red-600">
-          {error.message}
-        </span>
+        <span className="text-xs font-medium text-red-600">{error}</span>
       )}
     </div>
   );

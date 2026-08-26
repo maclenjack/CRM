@@ -10,14 +10,23 @@ export const activityTableSelect = {
   priority: true,
   startDate: true,
   endDate: true,
+  isDone: true,
   deal: {
     select: {
+      id: true,
       title: true,
     },
   },
   contactPerson: {
     select: {
+      id: true,
       name: true,
+      organization: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
       emails: {
         select: {
           id: true,
@@ -36,6 +45,7 @@ export const activityTableSelect = {
   },
   organization: {
     select: {
+      id: true,
       name: true,
     },
   },

@@ -1,3 +1,4 @@
+import type { ComboboxOption } from '@/components/form/AsyncCombobox';
 import type {
   DealGetPayload,
   DealModel,
@@ -13,23 +14,32 @@ export const dealKanbanCardSelect = {
   status: true,
   priority: true,
   position: true,
+  expectedCloseDate: true,
   contactPerson: {
     select: {
+      id: true,
       name: true,
     },
   },
   organization: {
     select: {
+      id: true,
       name: true,
     },
   },
-} satisfies DealSelect;
+} as const satisfies DealSelect;
 
-export type DealKanbanCard = DealGetPayload<{
+type RawDealKanbanCard = DealGetPayload<{
   select: typeof dealKanbanCardSelect;
 }>;
 
-export function mapDealToOption(deal: Pick<DealModel, 'id' | 'title'>) {
+export type DealKanbanCard = Omit<RawDealKanbanCard, 'value'> & {
+  value: number;
+};
+
+export function mapDealToOption(
+  deal: Pick<DealModel, 'id' | 'title'>
+): ComboboxOption {
   return {
     value: deal.id,
     label: deal.title,

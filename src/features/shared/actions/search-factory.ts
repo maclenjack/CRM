@@ -9,11 +9,13 @@ const SearchQuerySchema = z
   .max(100, { message: 'Search query too long' })
   .transform((val) => val.replace(/[%_\\]/g, '\\$&'));
 
-export function createSearchAction<TModel>(
-  prismaModel: { findMany: (args: any) => Promise<TModel[]> },
+type PrismaDelegate = { findMany: (args: any) => Promise<any> };
+
+export function createSearchAction<TModel, TDelegate extends PrismaDelegate>(
+  prismaModel: TDelegate,
   options: {
-    searchField: keyof TModel;
-    selectFields: Record<keyof TModel, boolean>;
+    searchField: string;
+    selectFields: Record<string, any>;
     limit?: number;
   }
 ) {
@@ -28,19 +30,16 @@ export function createSearchAction<TModel>(
 
     try {
       if (trimmedQuery.length < 2) {
-        const defaultResults = await prismaModel.findMany({
-          where: {
-            ownerId: session.user.id,
-          },
+        const defaultResults = await (prismaModel as any).findMany({
+          where: { ownerId: session.user.id },
           select: options.selectFields,
           take: options.limit || 15,
-          orderBy: {
-            createdAt: 'desc',
-          },
+          orderBy: { createdAt: 'desc' },
         });
+
         return {
           success: true,
-          data: defaultResults,
+          data: defaultResults as TModel[],
           isDefaultData: true,
         };
       }
@@ -54,7 +53,7 @@ export function createSearchAction<TModel>(
         };
       }
 
-      const results = await prismaModel.findMany({
+      const results = await (prismaModel as any).findMany({
         where: {
           ownerId: session.user.id,
           [options.searchField]: {
@@ -67,7 +66,7 @@ export function createSearchAction<TModel>(
         orderBy: { [options.searchField]: 'asc' },
       });
 
-      return { success: true, data: results, isDefaultData: false };
+      return { success: true, data: results as TModel[], isDefaultData: false };
     } catch (error) {
       console.error(`CRITICAL: Generic search action failed:`, error);
       return {

@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 import { AsyncCombobox } from '@/components/form/AsyncCombobox';
-import { DateTimePicker } from '@/components/form/DateTimePicker';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,18 +17,14 @@ import {
 } from '@/components/ui/dialog';
 import { FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import {
   ActivityFormSchema,
   type ActivityFormValues,
 } from '@/features/activity/activity.validation';
+import { ActivityDateTimeField } from '@/features/activity/components/ActivityDateTimeField';
+import { ActivityPrioritySelect } from '@/features/activity/components/ActivityPrioritySelect';
+import { ActivityTypeSelect } from '@/features/activity/components/ActivityTypeSelect';
 import { mapDealToOption } from '@/features/deal/deal';
 import { searchDeals } from '@/features/deal/deal.actions';
 import { mapOrganizationToOption } from '@/features/organization/organization';
@@ -40,20 +35,47 @@ import { ActivityType, PriorityLevel } from '@/generated/prisma/enums';
 
 type FormInput = z.input<typeof ActivityFormSchema>;
 
-interface AddActivityModalProps {
+interface ActivityModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialData?: ActivityFormValues & {
+    id?: string;
+    dealTitle?: string | null;
+    personName?: string | null;
+    organizationName?: string | null;
+  };
   onSubmitSuccess: (
     data: ActivityFormValues
   ) => Promise<{ success: boolean; error?: string }>;
 }
 
-export function AddActivityModal({
+export function ActivityModal({
   isOpen,
   onClose,
+  initialData,
   onSubmitSuccess,
-}: AddActivityModalProps) {
+}: ActivityModalProps) {
+  const isEditing = !!initialData;
+
   const defaultValues = useMemo(() => {
+    if (initialData) {
+      return {
+        subject: initialData.subject ?? '',
+        type: initialData.type ?? ActivityType.CALL,
+        startDateTime: initialData.startDateTime
+          ? new Date(initialData.startDateTime)
+          : new Date(),
+        endDateTime: initialData.endDateTime
+          ? new Date(initialData.endDateTime)
+          : new Date(),
+        priority: initialData.priority ?? PriorityLevel.MEDIUM,
+        note: initialData.note ?? '',
+        dealId: initialData.dealId ?? undefined,
+        personId: initialData.personId ?? undefined,
+        organizationId: initialData.organizationId ?? undefined,
+      };
+    }
+
     const now: Date = new Date();
     const roundedStart: Date = new Date();
     roundedStart.setMinutes(0, 0, 0);
@@ -73,7 +95,7 @@ export function AddActivityModal({
       personId: undefined,
       organizationId: undefined,
     };
-  }, []);
+  }, [initialData]);
 
   const {
     register,
@@ -86,12 +108,6 @@ export function AddActivityModal({
     defaultValues,
     mode: 'onTouched',
   });
-
-  const getTypedDateFieldValue = (value: unknown): Date | undefined => {
-    if (!value) return undefined;
-    if (value instanceof Date) return value;
-    return new Date(value as string);
-  };
 
   const handleFormSubmit = async (
     rawData: z.input<typeof ActivityFormSchema>
@@ -111,20 +127,33 @@ export function AddActivityModal({
     }
   };
 
+  const getSubmitButtonLabel = () => {
+    if (isSubmitting) return 'Saving...';
+    if (isEditing) return 'Save Changes';
+    return 'Save Activity';
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
+      modal={true}
+    >
       <DialogContent
         className="
           rounded-xl border border-slate-100 bg-white p-6 shadow-xl
           sm:max-w-125
         "
+        onKeyDown={(e) => e.stopPropagation()}
       >
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-slate-900">
-            Create New Activity
+            {isEditing ? 'Edit Activity' : 'Create New Activity'}
           </DialogTitle>
           <DialogDescription className="text-sm text-slate-500">
-            Log active business engagements and track project deadlines.
+            {isEditing
+              ? 'Update existing business engagement details.'
+              : 'Log active business engagements and track project deadlines.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -154,109 +183,33 @@ export function AddActivityModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
-              <FieldLabel required className="font-semibold text-slate-700">
-                Type
-              </FieldLabel>
-              <Controller
-                control={control}
-                name="type"
-                render={({ field }) => (
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="CALL">Call</SelectItem>
-                      <SelectItem value="MEETING">Meeting</SelectItem>
-                      <SelectItem value="EMAIL">Email</SelectItem>
-                      <SelectItem value="TASK">Task</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.type && (
-                <span className="text-xs font-medium text-red-600">
-                  {errors.type.message}
-                </span>
-              )}
+              <ActivityTypeSelect control={control} name="type" required />
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <FieldLabel required className="font-semibold text-slate-700">
-                Priority
-              </FieldLabel>
-              <Controller
+              <ActivityPrioritySelect
                 control={control}
                 name="priority"
-                render={({ field }) => (
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select priority" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="LOW">Low</SelectItem>
-                      <SelectItem value="MEDIUM">Medium</SelectItem>
-                      <SelectItem value="HIGH">High</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
+                required
               />
-              {errors.priority && (
-                <span className="text-xs font-medium text-red-600">
-                  {errors.priority.message}
-                </span>
-              )}
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <FieldLabel required className="font-semibold text-slate-700">
-                Starts At
-              </FieldLabel>
-              <Controller
-                control={control}
-                name="startDateTime"
-                render={({ field }) => (
-                  <DateTimePicker
-                    date={getTypedDateFieldValue(field.value)}
-                    setDate={field.onChange}
-                  />
-                )}
-              />
-              {errors.startDateTime && (
-                <span className="text-xs font-medium text-red-600">
-                  {errors.startDateTime.message}
-                </span>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <FieldLabel required className="font-semibold text-slate-700">
-                Ends At
-              </FieldLabel>
-              <Controller
-                control={control}
-                name="endDateTime"
-                render={({ field }) => (
-                  <DateTimePicker
-                    date={getTypedDateFieldValue(field.value)}
-                    setDate={field.onChange}
-                  />
-                )}
-              />
-              {errors.endDateTime && (
-                <span className="text-xs font-medium text-destructive">
-                  {errors.endDateTime.message}
-                </span>
-              )}
-            </div>
+            <ActivityDateTimeField
+              control={control}
+              name="startDateTime"
+              label="Starts At"
+              required
+              placeholder="Select start date and time"
+            />
+            <ActivityDateTimeField
+              control={control}
+              name="endDateTime"
+              label="Ends At"
+              required
+              placeholder="Select end date and time"
+            />
           </div>
 
           <div
@@ -265,32 +218,58 @@ export function AddActivityModal({
               sm:grid-cols-2
             "
           >
-            <AsyncCombobox
+            <Controller
               control={control}
               name="dealId"
-              label="Deal"
-              placeholder="Select a deal..."
-              searchPlaceholder="Type deal name..."
-              fetchOptions={searchDeals}
-              mapOption={mapDealToOption}
+              render={({ field, fieldState }) => (
+                <AsyncCombobox
+                  value={field.value ?? null}
+                  initialLabel={initialData?.dealTitle ?? ''}
+                  onChange={field.onChange}
+                  error={fieldState.error?.message}
+                  label="Deal"
+                  placeholder="Select a deal..."
+                  searchPlaceholder="Type deal name..."
+                  fetchOptions={searchDeals}
+                  mapOption={mapDealToOption}
+                />
+              )}
             />
-            <AsyncCombobox
+
+            <Controller
               control={control}
               name="personId"
-              label="Contact Person"
-              placeholder="Select a contact person..."
-              searchPlaceholder="Type persons name..."
-              fetchOptions={searchPeople}
-              mapOption={mapPersonToOption}
+              render={({ field, fieldState }) => (
+                <AsyncCombobox
+                  value={field.value ?? null}
+                  initialLabel={initialData?.personName ?? ''}
+                  onChange={field.onChange}
+                  error={fieldState.error?.message}
+                  label="Contact Person"
+                  placeholder="Select a contact person..."
+                  searchPlaceholder="Type persons name..."
+                  fetchOptions={searchPeople}
+                  mapOption={mapPersonToOption}
+                />
+              )}
             />
-            <AsyncCombobox
+
+            <Controller
               control={control}
               name="organizationId"
-              label="Associated Organization"
-              placeholder="Select an organization..."
-              searchPlaceholder="Type company name..."
-              fetchOptions={searchOrganizations}
-              mapOption={mapOrganizationToOption}
+              render={({ field, fieldState }) => (
+                <AsyncCombobox
+                  value={field.value ?? null}
+                  initialLabel={initialData?.organizationName ?? ''}
+                  onChange={field.onChange}
+                  error={fieldState.error?.message}
+                  label="Associated Organization"
+                  placeholder="Select an organization..."
+                  searchPlaceholder="Type company name..."
+                  fetchOptions={searchOrganizations}
+                  mapOption={mapOrganizationToOption}
+                />
+              )}
             />
           </div>
 
@@ -322,7 +301,7 @@ export function AddActivityModal({
               Cancel
             </Button>
             <Button type="submit" variant="default" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save Activity'}
+              {getSubmitButtonLabel()}
             </Button>
           </div>
         </form>

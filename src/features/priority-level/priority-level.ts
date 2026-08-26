@@ -10,15 +10,15 @@ export interface PriorityMetadata extends BaseMeta {
 export const PRIORITY_METADATA = {
   [PrismaPriorityLevel.HIGH]: {
     className: 'bg-destructive text-destructive-foreground',
-    sortingValue: 3,
+    sortingValue: 2,
   },
   [PrismaPriorityLevel.MEDIUM]: {
     className: 'bg-warning text-warning-foreground',
-    sortingValue: 2,
+    sortingValue: 1,
   },
   [PrismaPriorityLevel.LOW]: {
     className: 'bg-info text-info-foreground',
-    sortingValue: 1,
+    sortingValue: 0,
   },
 } satisfies Record<
   PrismaPriorityLevel,

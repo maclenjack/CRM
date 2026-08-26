@@ -10,16 +10,8 @@ import {
 } from 'react-hook-form';
 
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { PipelineStage } from '@/features/deal/pipeline-stage';
 import { cn } from '@/features/shared/utils/cn';
-
-const STAGE_LABELS: Record<string, string> = {
-  QUALIFIED: 'Qualified',
-  CONTACT_MADE: 'Contact Made',
-  DEMO_SCHEDULED: 'Demo Scheduled',
-  PROPOSAL_MADE: 'Proposal Made',
-  NEGOTIATIONS_STARTED: 'Negotiations Started',
-  WON: 'Won',
-};
 
 interface DealStageFieldProps<
   TFieldValues extends FieldValues,
@@ -40,39 +32,39 @@ export function DealStageField<
   name,
   label = 'Pipeline Stage',
 }: DealStageFieldProps<TFieldValues, TName>) {
-  const stages = Object.keys(STAGE_LABELS);
-
   return (
     <Controller<TFieldValues, TName>
       control={control}
       name={name}
-      render={({ field }) => {
-        const currentStageIndex = stages.indexOf(field.value || '');
+      render={({ field, fieldState }) => {
+        const pipelineStage = PipelineStage.fromValue(field.value);
+        const pipelineStages = PipelineStage.values().sort(
+          PipelineStage.sortfn
+        );
+        const currentStageIndex = pipelineStages.indexOf(pipelineStage);
 
         return (
           <Field className="flex w-full flex-col gap-2">
             <div className="flex items-baseline justify-between">
               <FieldLabel required>{label}</FieldLabel>
               <span className="text-sm font-semibold text-primary">
-                {STAGE_LABELS[field.value] || 'Select a stage...'}
+                {pipelineStage.label || 'Select a stage...'}
               </span>
             </div>
 
             <div className="flex w-full items-center gap-1">
-              {stages.map((stageKey, index) => {
-                const isCurrent = stageKey === field.value;
+              {pipelineStages.map(({ value, label, sortingValue: index }) => {
+                const isCurrent = value === field.value;
                 const isPast = index < currentStageIndex;
 
                 return (
                   <button
-                    key={stageKey}
+                    key={value}
                     type="button"
                     onClick={() => {
-                      setValue(
-                        name,
-                        stageKey as PathValue<TFieldValues, TName>,
-                        { shouldValidate: true }
-                      );
+                      setValue(name, value as PathValue<TFieldValues, TName>, {
+                        shouldValidate: true,
+                      });
                     }}
                     className={cn(
                       `
@@ -87,19 +79,20 @@ export function DealStageField<
                         `,
                       isCurrent && 'bg-primary text-primary-foreground',
                       index === 0 && 'clip-chevron-first',
-                      index === stages.length - 1 && 'clip-chevron-last',
+                      index === pipelineStages.length - 1 &&
+                        'clip-chevron-last',
                       index > 0 &&
-                        index < stages.length - 1 &&
+                        index < pipelineStages.length - 1 &&
                         'clip-chevron-mid'
                     )}
-                    title={STAGE_LABELS[stageKey]}
-                    aria-label={`Set stage to ${STAGE_LABELS[stageKey]}`}
+                    title={label}
+                    aria-label={`Set stage to ${label}`}
                   />
                 );
               })}
             </div>
 
-            <FieldError />
+            <FieldError errors={[fieldState.error]} />
           </Field>
         );
       }}

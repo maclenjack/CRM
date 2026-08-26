@@ -14,35 +14,38 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { OrganizationNameField } from '@/features/organization/components/OrganizationNameField';
 
 import {
   OrganizationFormSchema,
   type OrganizationFormValues,
 } from '../organization.validation';
 
-interface AddOrganizationModalProps {
+interface OrganizationModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialData?: OrganizationFormValues & { id?: string };
   onSubmitSuccess: (
     data: OrganizationFormValues
   ) => Promise<{ success: boolean; error?: string }>;
 }
 
-export function AddOrganizationModal({
+export function OrganizationModal({
   isOpen,
   onClose,
+  initialData,
   onSubmitSuccess,
-}: AddOrganizationModalProps) {
+}: OrganizationModalProps) {
+  const isEditing = !!initialData;
+
   const {
-    register,
+    control,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = useForm<OrganizationFormValues>({
     resolver: zodResolver(OrganizationFormSchema),
-    defaultValues: { name: '' },
+    defaultValues: { name: initialData?.name ?? '' },
     mode: 'onTouched',
   });
 
@@ -68,13 +71,24 @@ export function AddOrganizationModal({
     }
   };
 
+  const getSubmitButtonLabel = () => {
+    if (isSubmitting) return 'Saving...';
+    if (isEditing) return 'Save Changes';
+    return 'Create Organization';
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
+      modal={true}
+    >
       <DialogContent
         className="
           rounded-xl border border-border bg-card p-6 shadow-lg transition-all
           sm:max-w-115
         "
+        onKeyDown={(e) => e.stopPropagation()}
       >
         <DialogHeader className="space-y-1.5 pr-6">
           <DialogTitle
@@ -91,11 +105,12 @@ export function AddOrganizationModal({
             >
               <Building2Icon className="size-4.5" />
             </div>
-            Create New Organization
+            {isEditing ? 'Edit Organization' : 'Create New Organization'}
           </DialogTitle>
           <DialogDescription className="text-xs/relaxed text-muted-foreground">
-            Add a profile for a new client company or account partnership
-            record.
+            {isEditing
+              ? 'Update details for this client company or account partnership.'
+              : 'Add a profile for a new client company or account partnership record.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -103,32 +118,7 @@ export function AddOrganizationModal({
           onSubmit={handleSubmit(handleFormSubmit)}
           className="space-y-6 pt-2"
         >
-          <div className="space-y-2">
-            <FieldLabel
-              htmlFor="name"
-              required
-              className="
-                text-[10px] font-bold tracking-wider text-muted-foreground
-                uppercase
-              "
-            >
-              Organization Name
-            </FieldLabel>
-            <Input
-              id="name"
-              placeholder="e.g. Acme Corporation"
-              className="
-                h-10 bg-background text-sm
-                focus-visible:ring-1 focus-visible:ring-ring
-              "
-              {...register('name')}
-            />
-            {errors.name && (
-              <p className="mt-1 text-xs font-medium text-destructive">
-                {errors.name.message}
-              </p>
-            )}
-          </div>
+          <OrganizationNameField control={control} name="name" required />
 
           <div
             className="
@@ -151,7 +141,7 @@ export function AddOrganizationModal({
               className="h-9 px-4 text-xs font-medium shadow-sm"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Saving...' : 'Create Organization'}
+              {getSubmitButtonLabel()}
             </Button>
           </div>
         </form>

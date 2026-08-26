@@ -16,6 +16,7 @@ interface ModalButtonProps<T = Record<string, never>> {
   modalProps?: T;
   children: React.ReactNode;
   asChild?: boolean;
+  onClose?: () => void;
 }
 
 export function ModalButton<T = Record<string, never>>({
@@ -23,10 +24,16 @@ export function ModalButton<T = Record<string, never>>({
   modalProps,
   children,
   asChild = false,
+  onClose,
 }: ModalButtonProps<T>) {
   const [isModalOpen, setModalOpen] = useState(false);
 
   const Component = asChild ? Slot : Button;
+
+  const handleClose = () => {
+    setModalOpen(false);
+    onClose?.();
+  };
 
   return (
     <>
@@ -35,7 +42,7 @@ export function ModalButton<T = Record<string, never>>({
       {isModalOpen && (
         <Modal
           isOpen={isModalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={handleClose}
           {...(modalProps as T)}
         />
       )}

@@ -1,8 +1,11 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import { DealKanbanCardItem } from '@/features/deal/components/DealKanbanCardItem';
 import type { DealKanbanCard } from '@/features/deal/deal';
 import { KanbanBoard } from '@/features/kanban-board/components/KanbanBoard';
+import { KanbanLoadingPlaceholder } from '@/features/kanban-board/components/KanbanLoadingPlaceholder';
 import type { KanbanColumnData } from '@/features/kanban-board/kanban-board.types';
 import type { MoveCardInput } from '@/features/kanban-board/kanban-board.validation';
 
@@ -26,6 +29,15 @@ export function DealKanbanClient({
   initialCards,
   onCardMoved,
 }: DealKanbanClientProps) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return <KanbanLoadingPlaceholder />;
+  }
   return (
     <KanbanBoard<EnrichedKanbanCard>
       initialColumns={columns}

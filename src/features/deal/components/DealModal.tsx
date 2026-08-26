@@ -1,13 +1,14 @@
 'use client';
 
-import React from 'react';
+import { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type z from 'zod';
+import type { z } from 'zod';
 
 import { AsyncCombobox } from '@/components/form/AsyncCombobox';
 import { CurrencyField } from '@/components/form/CurrencyField';
+import { DateTimePicker } from '@/components/form/DateTimePicker';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -16,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Field, FieldLabel } from '@/components/ui/field';
+import { FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -27,15 +28,19 @@ import {
 } from '@/components/ui/select';
 import { DealAmountField } from '@/features/deal/components/DealAmountField';
 import { DealStageField } from '@/features/deal/components/DealStageField';
+import type { DealModalInitialValues } from '@/features/deal/deal.utils';
 import {
-  DealFormSchema,
-  type DealFormValues,
-  PINNED_CURRENCY_OPTIONS,
+  CreateDealSchema,
+  type CreateDealValues,
+  UpdateDealSchema,
+  type UpdateDealValues,
 } from '@/features/deal/deal.validation';
 import { mapOrganizationToOption } from '@/features/organization/organization';
 import { searchOrganizations } from '@/features/organization/organization.actions';
 import { mapPersonToOption } from '@/features/person/person';
 import { searchPeople } from '@/features/person/person.actions';
+import { PINNED_CURRENCY_OPTIONS } from '@/features/shared/utils/currency';
+import { getTypedDateFieldValue } from '@/features/shared/utils/date';
 import { formatScreamingSnake } from '@/features/shared/utils/string';
 import {
   DealStatus,
@@ -43,39 +48,61 @@ import {
   PriorityLevel,
 } from '@/generated/prisma/enums';
 
-type FormInput = z.input<typeof DealFormSchema>;
+type FormInput = z.input<typeof CreateDealSchema>;
 
-interface AddDealModalProps {
+interface DealModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialData?: DealModalInitialValues;
   onSubmitSuccess: (
-    data: DealFormValues
-  ) => Promise<{ success: boolean; error?: string }>;
+    data: CreateDealValues | UpdateDealValues
+  ) => Promise<unknown>;
 }
 
-export function AddDealModal({
+export function DealModal({
   isOpen,
   onClose,
+  initialData,
   onSubmitSuccess,
-}: AddDealModalProps) {
-  const defaultValues = React.useMemo(() => {
+}: DealModalProps) {
+  const isEditing = !!initialData;
+  const activeSchema = isEditing ? UpdateDealSchema : CreateDealSchema;
+
+  const defaultValues = useMemo(() => {
+    if (initialData) {
+      return {
+        title: initialData.title ?? '',
+        value: initialData.value ? String(initialData.value) : '0',
+        currency: initialData.currency ?? PINNED_CURRENCY_OPTIONS[0].value,
+        personId: initialData.personId ?? undefined,
+        organizationId: initialData.organizationId ?? undefined,
+        stage: initialData.stage ?? PipelineStage.CONTACT_MADE,
+        status: initialData.status ?? DealStatus.OPEN,
+        priority: initialData.priority ?? PriorityLevel.MEDIUM,
+        expectedCloseDate: initialData.expectedCloseDate
+          ? new Date(initialData.expectedCloseDate)
+          : null,
+      };
+    }
+
     const roundedStart = new Date();
     roundedStart.setMinutes(0, 0, 0);
     if (new Date().getMinutes() >= 30) {
       roundedStart.setHours(roundedStart.getHours() + 1);
     }
+
     return {
       title: '',
-      value: 0,
+      value: '0',
       currency: PINNED_CURRENCY_OPTIONS[0].value,
-      personId: '',
-      organizationId: '',
+      personId: undefined,
+      organizationId: undefined,
       stage: PipelineStage.CONTACT_MADE,
       status: DealStatus.OPEN,
       priority: PriorityLevel.MEDIUM,
       expectedCloseDate: roundedStart,
     };
-  }, []);
+  }, [initialData]);
 
   const {
     register,
@@ -85,14 +112,14 @@ export function AddDealModal({
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormInput>({
-    resolver: zodResolver(DealFormSchema),
+    resolver: zodResolver(activeSchema),
     defaultValues,
     mode: 'onTouched',
   });
 
-  const handleFormSubmit = async (rawData: z.input<typeof DealFormSchema>) => {
+  const handleFormSubmit = async (rawData: FormInput) => {
     try {
-      const validatedData = DealFormSchema.parse(rawData);
+      const validatedData = activeSchema.parse(rawData);
 
       await onSubmitSuccess(validatedData);
 
@@ -107,27 +134,36 @@ export function AddDealModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
+      modal={true}
+    >
       <DialogContent
         className="
           rounded-xl border border-slate-100 bg-white p-6 shadow-xl
-          sm:max-w-120
+          sm:max-w-125
         "
+        onKeyDown={(e) => e.stopPropagation()}
       >
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-slate-900">
-            Create New Deal
+            {isEditing ? 'Edit Deal' : 'Create New Deal'}
           </DialogTitle>
           <DialogDescription className="text-sm text-slate-500">
-            Fill out the details below to log a new deal pipeline record.
+            {isEditing
+              ? 'Update existing deal pipeline record details.'
+              : 'Fill out the details below to log a new deal pipeline record.'}
           </DialogDescription>
         </DialogHeader>
 
         <form
-          onSubmit={handleSubmit(handleFormSubmit)}
+          onSubmit={handleSubmit(handleFormSubmit, (errors) =>
+            console.error('Form validation failed:', errors)
+          )}
           className="space-y-4 pt-2"
         >
-          <Field className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5">
             <FieldLabel
               htmlFor="title"
               required
@@ -139,14 +175,13 @@ export function AddDealModal({
               id="title"
               placeholder="e.g. Acme Corp Software Expansion"
               {...register('title')}
-              aria-invalid={!!errors.title}
             />
             {errors.title && (
-              <span className="text-xs font-medium text-destructive">
+              <span className="text-xs font-medium text-red-600">
                 {errors.title.message}
               </span>
             )}
-          </Field>
+          </div>
 
           <div
             className="
@@ -154,23 +189,42 @@ export function AddDealModal({
               sm:grid-cols-2
             "
           >
-            <AsyncCombobox
+            <Controller
               control={control}
               name="personId"
-              label="Contact Person"
-              placeholder="Select a contact person..."
-              searchPlaceholder="Type persons name..."
-              fetchOptions={searchPeople}
-              mapOption={mapPersonToOption}
+              render={({ field, fieldState }) => (
+                <AsyncCombobox
+                  required={true}
+                  value={field.value ?? null}
+                  initialLabel={initialData?.personName ?? ''}
+                  onChange={field.onChange}
+                  error={fieldState.error?.message}
+                  label="Contact Person"
+                  placeholder="Select a contact person..."
+                  searchPlaceholder="Type persons name..."
+                  fetchOptions={searchPeople}
+                  mapOption={mapPersonToOption}
+                />
+              )}
             />
-            <AsyncCombobox
+
+            <Controller
               control={control}
               name="organizationId"
-              label="Associated Organization"
-              placeholder="Select an organization..."
-              searchPlaceholder="Type company name..."
-              fetchOptions={searchOrganizations}
-              mapOption={mapOrganizationToOption}
+              render={({ field, fieldState }) => (
+                <AsyncCombobox
+                  required={true}
+                  value={field.value ?? null}
+                  initialLabel={initialData?.organizationName ?? ''}
+                  onChange={field.onChange}
+                  error={fieldState.error?.message}
+                  label="Associated Organization"
+                  placeholder="Select an organization..."
+                  searchPlaceholder="Type company name..."
+                  fetchOptions={searchOrganizations}
+                  mapOption={mapOrganizationToOption}
+                />
+              )}
             />
           </div>
 
@@ -210,11 +264,10 @@ export function AddDealModal({
               />
             </div>
 
-            <Field className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5">
               <FieldLabel required className="font-semibold text-slate-700">
                 Priority
               </FieldLabel>
-
               <Controller
                 control={control}
                 name="priority"
@@ -237,26 +290,51 @@ export function AddDealModal({
                   </Select>
                 )}
               />
-
               {errors.priority && (
-                <span className="text-xs font-medium text-destructive">
+                <span className="text-xs font-medium text-red-600">
                   {errors.priority.message}
                 </span>
               )}
-            </Field>
+            </div>
           </div>
 
-          <div className="mt-6 flex justify-end space-x-2 pt-2">
+          <div className="flex flex-col gap-1.5">
+            <FieldLabel required className="font-semibold text-slate-700">
+              Expected Close Date
+            </FieldLabel>
+            <Controller
+              control={control}
+              name="expectedCloseDate"
+              render={({ field }) => (
+                <DateTimePicker
+                  date={getTypedDateFieldValue(field.value)}
+                  setDate={field.onChange}
+                  minDate={isEditing ? undefined : new Date()}
+                />
+              )}
+            />
+            {errors.expectedCloseDate && (
+              <span className="text-xs font-medium text-red-600">
+                {errors.expectedCloseDate.message}
+              </span>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               onClick={onClose}
               disabled={isSubmitting}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save'}
+            <Button type="submit" variant="default" disabled={isSubmitting}>
+              {isSubmitting
+                ? 'Saving...'
+                : isEditing
+                  ? 'Save Changes'
+                  : 'Save Deal'}
             </Button>
           </div>
         </form>
