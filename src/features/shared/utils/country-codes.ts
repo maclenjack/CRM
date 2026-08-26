@@ -21,7 +21,7 @@ const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
 export const localizedCountryCodes: CountryCodeOption[] = targetCountries
   .map((code) => {
-    let dialCode = '+1';
+    let dialCode = '+64';
     try {
       dialCode = `+${getCountryCallingCode(code)}`;
     } catch (e) {
