@@ -16,17 +16,23 @@ import {
 } from '@/features/deal/deal.actions';
 import { PipelineStage } from '@/features/deal/pipeline-stage';
 import type { MoveCardInput } from '@/features/kanban-board/kanban-board.validation';
+import convertDecimalsToStrings from '@/features/shared/utils/convert-decimals-to-strings';
 import prisma from '@/lib/prisma';
 
 export async function DealKanbanWrapper() {
   const session = await auth();
   if (!session?.user) return null;
 
-  const deals: DealKanbanCard[] = await prisma.deal.findMany({
+  const rawDeals = await prisma.deal.findMany({
     where: { ownerId: session.user.id },
     orderBy: { position: 'asc' },
     select: dealKanbanCardSelect,
   });
+
+  // Convert Prisma Decimal objects to strings for client-side use
+  const deals: DealKanbanCard[] = convertDecimalsToStrings(
+    rawDeals
+  ) as DealKanbanCard[];
 
   if (deals.length === 0) {
     return (

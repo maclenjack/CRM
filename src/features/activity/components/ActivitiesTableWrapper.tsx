@@ -12,17 +12,19 @@ import {
 import { createActivity } from '@/features/activity/activity.actions';
 import { ActivitiesTable } from '@/features/activity/components/ActivitiesTable';
 import { AddActivityModal } from '@/features/activity/components/AddActivityModal';
-import prisma from '@/lib/prisma';
-
+import prisma from '@/lib/prisma';import convertDecimalsToStrings from '@/features/shared/utils/convert-decimals-to-strings';
 export async function ActivitiesTableWrapper() {
   const session = await auth();
   if (!session?.user) return null;
 
-  const activities: ActivityTableSelect[] = await prisma.activity.findMany({
-    where: { ownerId: session.user.id },
-    select: activityTableSelect,
-    orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
-  });
+  const rawActivities = await prisma.activity.findMany({
+      where: { ownerId: session.user.id },
+      select: activityTableSelect,
+      orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+    });
+
+    // Convert Prisma Decimal objects to strings for client-side use
+    const activities: ActivityTableSelect[] = convertDecimalsToStrings(rawActivities) as ActivityTableSelect[];
 
   if (activities.length === 0) {
     return (

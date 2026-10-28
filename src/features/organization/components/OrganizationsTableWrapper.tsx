@@ -11,6 +11,7 @@ import {
   organizationsTableSelect,
 } from '@/features/organization/organization';
 import { createOrganization } from '@/features/organization/organization.actions';
+import convertDecimalsToStrings from '@/features/shared/utils/convert-decimals-to-strings';
 import prisma from '@/lib/prisma';
 
 import { OrganizationsTable } from './OrganizationsTable';
@@ -19,11 +20,15 @@ export async function OrganizationsTableWrapper() {
   const session = await auth();
   if (!session?.user) return null;
 
-  const organizations: OrganizationTableSelect[] =
-    await prisma.organization.findMany({
-      where: { ownerId: session.user.id },
-      select: organizationsTableSelect,
-    });
+  const rawOrganizations = await prisma.organization.findMany({
+    where: { ownerId: session.user.id },
+    select: organizationsTableSelect,
+  });
+
+  // Convert Prisma Decimal objects to strings for client-side use
+  const organizations: OrganizationTableSelect[] = convertDecimalsToStrings(
+    rawOrganizations
+  ) as OrganizationTableSelect[];
 
   if (organizations.length === 0) {
     return (
