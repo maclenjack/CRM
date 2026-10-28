@@ -21,7 +21,8 @@ export function parseCSV<T = Record<string, string>>(
   file: File | string,
   options: ParseOptions<T> = {}
 ): Promise<ParseResult<T>> {
-  return new Promise((resolve, reject) => {
+  // eslint-disable-next-line compat/compat
+  return new Promise((resolve, _reject) => {
     const config: Papa.ParseConfig<T> = {
       header: options.header ?? true,
       skipEmptyLines: options.skipEmptyLines ?? 'greedy',
@@ -47,7 +48,8 @@ export function parseCSVString<T = Record<string, string>>(
   csvString: string,
   options: ParseOptions<T> = {}
 ): Promise<ParseResult<T>> {
-  return new Promise((resolve, reject) => {
+  // eslint-disable-next-line compat/compat
+  return new Promise((resolve, _reject) => {
     const config: Papa.ParseConfig<T> = {
       header: options.header ?? true,
       skipEmptyLines: options.skipEmptyLines ?? 'greedy',
@@ -73,13 +75,14 @@ export function streamParseCSV<T = Record<string, string>>(
   onRow: (row: T, index: number) => void,
   options: ParseOptions<T> = {}
 ): Promise<{ errors: Papa.ParseError[]; meta: Papa.ParseMeta }> {
-  return new Promise((resolve, reject) => {
+  // eslint-disable-next-line compat/compat
+  return new Promise((resolve, _reject) => {
     let rowIndex = 0;
     const config: Papa.ParseConfig<T> = {
       header: options.header ?? true,
       skipEmptyLines: options.skipEmptyLines ?? 'greedy',
       transformHeader: options.transformHeader ?? ((h) => h.trim()),
-      step: (results, parser) => {
+      step: (results, _parser) => {
         if (Array.isArray(results.data) && results.data.length > 0) {
           onRow(results.data[0] as T, rowIndex++);
         }

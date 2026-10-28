@@ -10,17 +10,14 @@ export const PipedrivePersonCsvSchema = z.object({
   'Person - ID': z.string().min(1, 'Pipedrive ID is required'),
   'Person - Name': z.string().min(1, 'Name is required').max(70),
   'Person - Email - Work': z
-    .string()
     .email('Invalid email format')
     .optional()
     .or(z.literal('')),
   'Person - Email - Home': z
-    .string()
     .email('Invalid email format')
     .optional()
     .or(z.literal('')),
   'Person - Email - Other': z
-    .string()
     .email('Invalid email format')
     .optional()
     .or(z.literal('')),

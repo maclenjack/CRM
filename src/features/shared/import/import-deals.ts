@@ -168,7 +168,8 @@ export async function importDeals(
       }
 
       // Deduplication: check by externalId (Pipedrive ID) - from batch lookup
-      const existingDeal = existingDealsByExternalId.get(deal.externalId) || null;
+      const existingDeal =
+        existingDealsByExternalId.get(deal.externalId) || null;
 
       let dealId: string;
       let status: ImportRecordStatus;
@@ -191,13 +192,14 @@ export async function importDeals(
 
         // Check if data has actually changed
         const currentValue = currentDeal?.value ? Number(currentDeal.value) : 0;
-        const hasChanges = 
+        const hasChanges =
           currentDeal?.title !== deal.title ||
           currentValue !== deal.value ||
           currentDeal?.currency !== deal.currency ||
           currentDeal?.stage !== deal.stage ||
           currentDeal?.status !== deal.status ||
-          (currentDeal?.expectedCloseDate?.getTime() ?? null) !== (deal.expectedCloseDate?.getTime() ?? null) ||
+          (currentDeal?.expectedCloseDate?.getTime() ?? null) !==
+            (deal.expectedCloseDate?.getTime() ?? null) ||
           currentDeal?.personId !== personId ||
           currentDeal?.organizationId !== organizationId;
 

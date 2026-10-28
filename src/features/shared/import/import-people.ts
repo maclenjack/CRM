@@ -49,16 +49,21 @@ export async function importPeople(
 ): Promise<ImportResult['people']> {
   const { parseCSVString } = await import('./csv-parser');
   const parseResult = await parseCSVString<Record<string, string>>(csvContent);
-  
+
   // Check for parse errors
   if (parseResult.errors.length > 0) {
     console.error('[IMPORT] People CSV parse errors:', parseResult.errors);
-    throw new Error(`CSV parse failed: ${parseResult.errors.map(e => e.message).join(', ')}`);
+    throw new Error(
+      `CSV parse failed: ${parseResult.errors.map((e) => e.message).join(', ')}`
+    );
   }
-  
+
   const rows = parseResult.data;
   if (!rows || rows.length === 0) {
-    console.error('[IMPORT] People CSV parsed 0 rows. First 200 chars:', csvContent.slice(0, 200));
+    console.error(
+      '[IMPORT] People CSV parsed 0 rows. First 200 chars:',
+      csvContent.slice(0, 200)
+    );
     throw new Error('CSV parsed 0 rows - check file format');
   }
 
@@ -66,16 +71,27 @@ export async function importPeople(
   console.log('[IMPORT] People CSV first row keys:', Object.keys(rows[0]));
 
   const { valid, invalid } = validateAndTransformPersons(rows as any[]);
-  
-  console.log('[IMPORT] People validation:', { valid: valid.length, invalid: invalid.length });
-  
+
+  console.log('[IMPORT] People validation:', {
+    valid: valid.length,
+    invalid: invalid.length,
+  });
+
   if (valid.length === 0 && invalid.length === 0) {
-    console.error('[IMPORT] No valid or invalid rows after validation. Sample row:', JSON.stringify(rows[0]).slice(0, 500));
-    throw new Error('Validation produced no results - check column headers match schema');
+    console.error(
+      '[IMPORT] No valid or invalid rows after validation. Sample row:',
+      JSON.stringify(rows[0]).slice(0, 500)
+    );
+    throw new Error(
+      'Validation produced no results - check column headers match schema'
+    );
   }
-  
+
   if (valid.length === 0) {
-    console.error('[IMPORT] All people rows invalid. Errors:', invalid.slice(0, 5).map(i => i.errors));
+    console.error(
+      '[IMPORT] All people rows invalid. Errors:',
+      invalid.slice(0, 5).map((i) => i.errors)
+    );
   }
 
   const recordsToCreate: Array<{
@@ -182,7 +198,8 @@ export async function importPeople(
       }
 
       // Deduplication: check by externalId (Pipedrive ID) - from batch lookup
-      const existingPerson = existingPeopleByExternalId.get(person.externalId) || null;
+      const existingPerson =
+        existingPeopleByExternalId.get(person.externalId) || null;
 
       let personId: string;
       let status: ImportRecordStatus;
@@ -201,19 +218,35 @@ export async function importPeople(
 
         // Check if data has actually changed
         // Sort phones/emails by value for consistent comparison (order doesn't matter)
-        const currentPhones = [...(currentPerson?.phones || [])].sort((a, b) => a.phone.localeCompare(b.phone));
-        const newPhones = [...person.phones].sort((a, b) => a.value.localeCompare(b.value));
-        const phonesMatch = 
+        const currentPhones = [...(currentPerson?.phones || [])].sort((a, b) =>
+          a.phone.localeCompare(b.phone)
+        );
+        const newPhones = [...person.phones].sort((a, b) =>
+          a.value.localeCompare(b.value)
+        );
+        const phonesMatch =
           currentPhones.length === newPhones.length &&
-          currentPhones.every((p, i) => p.phone === newPhones[i].value && p.category === newPhones[i].category);
-        
-        const currentEmails = [...(currentPerson?.emails || [])].sort((a, b) => a.email.localeCompare(b.email));
-        const newEmails = [...person.emails].sort((a, b) => a.value.localeCompare(b.value));
-        const emailsMatch = 
-          currentEmails.length === newEmails.length &&
-          currentEmails.every((e, i) => e.email === newEmails[i].value && e.category === newEmails[i].category);
+          currentPhones.every(
+            (p, i) =>
+              p.phone === newPhones[i].value &&
+              p.category === newPhones[i].category
+          );
 
-        const hasChanges = 
+        const currentEmails = [...(currentPerson?.emails || [])].sort((a, b) =>
+          a.email.localeCompare(b.email)
+        );
+        const newEmails = [...person.emails].sort((a, b) =>
+          a.value.localeCompare(b.value)
+        );
+        const emailsMatch =
+          currentEmails.length === newEmails.length &&
+          currentEmails.every(
+            (e, i) =>
+              e.email === newEmails[i].value &&
+              e.category === newEmails[i].category
+          );
+
+        const hasChanges =
           currentPerson?.name !== person.name ||
           currentPerson?.organizationId !== organizationId ||
           !phonesMatch ||
