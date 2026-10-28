@@ -18,7 +18,7 @@ export async function ContactsCount({ userId }: MetricProps) {
 
 export async function PendingActivitiesCount({ userId }: MetricProps) {
   const count = await prisma.activity.count({
-    where: { ownerId: userId, done: false, deletedAt: null },
+    where: { ownerId: userId, isDone: false, deletedAt: null },
   });
   return <>{count} pending</>;
 }
@@ -35,7 +35,7 @@ export async function PipelineValue({ userId }: MetricProps) {
 export async function RecentActivityStream({ userId }: MetricProps) {
   const rawRecentActivities = await prisma.activity.findMany({
     take: 3,
-    where: { ownerId: userId, done: false, deletedAt: null },
+    where: { ownerId: userId, isDone: false, deletedAt: null },
     orderBy: { createdAt: 'desc' },
     include: { contactPerson: true },
   });
