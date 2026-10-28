@@ -21,7 +21,7 @@ export async function main() {
     data: {
       email: 'alice@example.com',
       name: 'Alice Smith',
-      role: 'user',
+      role: 'USER',
     },
   });
 
@@ -29,7 +29,7 @@ export async function main() {
     data: {
       email: 'bob@example.com',
       name: 'Bob Johnson',
-      role: 'user',
+      role: 'USER',
     },
   });
 
@@ -153,7 +153,7 @@ export async function main() {
     data: {
       subject: 'Follow up on proposal',
       type: 'CALL',
-      done: false,
+      isDone: false,
       priority: 'HIGH',
       startDate: new Date('2026-06-15T15:30:00Z'),
       endDate: new Date('2026-06-15T16:30:00Z'),
@@ -170,7 +170,7 @@ export async function main() {
     data: {
       subject: 'Schedule demo meeting',
       type: 'MEETING',
-      done: true,
+      isDone: true,
       priority: 'MEDIUM',
       startDate: new Date('2026-06-10T10:30:00Z'),
       endDate: new Date('2026-06-10T14:30:00Z'),
