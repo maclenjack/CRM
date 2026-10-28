@@ -1,6 +1,0 @@
-Person - ID,Person - Name,Person - Email - Work,Person - Email - Home,Person - Email - Other,Person - Phone - Work,Person - Phone - Home,Person - Phone - Mobile,Person - Phone - Other,Person - Organization,Person - Organization ID,Person - Owner
-person-001,John Doe,,,,+1234567890,,,,org-001,org-001,
-person-002,Jane Smith,jane@example.com,,,,,,,,org-002,org-002,
-person-003,,bob@example.com,,,+1234567892,,,,org-003,org-003,
-person-004,Alice Brown,alice@example.com,,,+1234567893,,,,,,
-person-005,Charlie Davis,charlie@example.com,,,+1234567894,,,,org-005,org-005,
