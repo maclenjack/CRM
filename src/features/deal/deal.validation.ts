@@ -42,41 +42,9 @@ export const DealFormSchema = BaseDealSchema;
 export type DealFormValues = z.infer<typeof DealFormSchema>;
 export type BaseDealValues = z.infer<typeof BaseDealSchema>;
 
-const allCodes = Intl.supportedValuesOf('currency');
-
-const pinnedCurrencies = ['NZD', 'USD', 'EUR', 'GBP', 'CAD', 'AUD'];
-
-export interface CurrencyOption {
-  value: string;
-  label: string;
-  code: string;
-  name: string;
-  symbol: string;
-}
-
-const formatCurrencyOption = (code: string): CurrencyOption => {
-  const nameFormatter = new Intl.DisplayNames(['en'], { type: 'currency' });
-  const symbolFormatter = new Intl.NumberFormat('en', {
-    style: 'currency',
-    currency: code,
-  });
-
-  const symbol =
-    symbolFormatter.formatToParts(0).find((p) => p.type === 'currency')
-      ?.value || '';
-  const name = nameFormatter.of(code) || '';
-
-  return {
-    value: code,
-    code,
-    name,
-    symbol,
-    label: symbol ? `${code} - ${name} (${symbol})` : `${code} - ${name}`,
-  };
-};
-
-export const PINNED_CURRENCY_OPTIONS =
-  pinnedCurrencies.map(formatCurrencyOption);
-export const REMAINING_CURRENCY_OPTIONS = allCodes
-  .filter((code) => !pinnedCurrencies.includes(code))
-  .map(formatCurrencyOption);
+// Re-export currency options from shared utility
+export {
+  PINNED_CURRENCY_OPTIONS,
+  REMAINING_CURRENCY_OPTIONS,
+  type CurrencyOption,
+} from '@/features/shared/utils/currency';
