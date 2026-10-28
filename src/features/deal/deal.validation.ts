@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 import {
-  DealStatusSchema,
-  PipelineStageSchema,
-  PriorityLevelSchema,
-} from '@/generated/zod';
+  DealStatus,
+  PipelineStage,
+  PriorityLevel,
+} from '@/generated/prisma/enums';
 
 export const BaseDealSchema = z.object({
   title: z
@@ -26,9 +26,9 @@ export const BaseDealSchema = z.object({
   personId: z.string().min(1, 'Contact person is required').trim(),
   organizationId: z.string().min(1, 'Organization is required').trim(),
 
-  stage: PipelineStageSchema.optional(),
-  status: DealStatusSchema.optional(),
-  priority: PriorityLevelSchema.optional(),
+  stage: z.enum(PipelineStage).optional(),
+  status: z.enum(DealStatus).optional(),
+  priority: z.enum(PriorityLevel).optional(),
   expectedCloseDate: z.coerce
     .date('Expected close date is required')
     .refine((date) => date >= new Date(new Date().setHours(0, 0, 0, 0)), {

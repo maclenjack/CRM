@@ -11,7 +11,9 @@ interface ActionPipelineOptions<TInput, TData> {
   rawInput: unknown;
   actionName: string;
   handler: (validatedInput: TInput, userId: string) => Promise<TData>;
-  authorize?: (userId: string) => Promise<{ allowed: boolean; reason?: string }>;
+  authorize?: (
+    userId: string
+  ) => Promise<{ allowed: boolean; reason?: string }>;
 }
 
 export async function actionPipeline<TInput, TData = { id: string }>({
@@ -40,7 +42,9 @@ export async function actionPipeline<TInput, TData = { id: string }>({
       });
       return {
         success: false,
-        error: authResult.reason || 'Forbidden: You do not have permission to perform this action.',
+        error:
+          authResult.reason ||
+          'Forbidden: You do not have permission to perform this action.',
       };
     }
   }
