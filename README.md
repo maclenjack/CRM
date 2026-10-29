@@ -1,36 +1,181 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CRM Platform
+
+A full-stack Customer Relationship Management (CRM) application built with **Next.js 16 (App Router)**, **Prisma ORM**, **Neon PostgreSQL**, and **NextAuth v5**.
+
+## Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| **Framework** | Next.js 16.2.6 (App Router, React 19, TypeScript) |
+| **Database** | PostgreSQL (Neon serverless) via Prisma 7.8 |
+| **Authentication** | NextAuth v5 (beta) with Credentials provider, Argon2 password hashing |
+| **Styling** | Tailwind CSS v4 with custom theme, Radix UI primitives |
+| **Forms & Validation** | React Hook Form + Zod v4 |
+| **Tables & Data** | TanStack React Table v8 |
+| **Drag & Drop** | @dnd-kit for Kanban board |
+| **Import/Export** | PapaParse for CSV processing |
+| **Analytics** | Vercel Analytics + Speed Insights |
+| **Package Manager** | pnpm |
+| **Testing** | Jest (unit), Playwright (e2e) - configured, tests pending |
+| **Linting** | ESLint + Prettier with strict rules |
+
+## Features
+
+- **Dashboard** - Overview metrics, recent activity, pipeline value
+- **Contacts Management** - People and Organizations with emails, phones, notes, labels
+- **Deals Pipeline** - Kanban board with drag-and-drop, stages, priorities, values
+- **Activities** - Tasks, meetings, calls, deadlines with date ranges
+- **Data Import** - Pipedrive CSV import with validation, progress tracking, rollback support
+- **Role-based Access** - Admin, Manager, User roles
+- **Soft Deletes** - All entities support soft deletion with `deletedAt`
+- **Audit Trail** - Created/updated by tracking on all models
+
+## Project Structure
+
+```text
+src/
+├── app/                    # Next.js App Router pages
+│   ├── (auth)/            # Public auth pages (sign-in, register)
+│   ├── (protected)/       # Protected routes requiring authentication
+│   │   ├── dashboard/     # Dashboard with metrics
+│   │   ├── contacts/      # People & Organizations
+│   │   ├── deals/         # Deals pipeline (Kanban)
+│   │   ├── activities/    # Activities calendar/list
+│   │   ├── import/        # CSV import wizard
+│   │   └── user/          # User settings
+│   └── api/               # API routes (auth, import)
+├── components/            # Shared UI components
+│   ├── ui/               # Radix-based primitives (Button, Card, Table, etc.)
+│   ├── sidebar/          # App sidebar navigation
+│   ├── form/             # Form components
+│   └── table/            # Table components with loading states
+├── features/             # Feature-based modules (domain-driven)
+│   ├── activity/         # Activity CRUD, validation, import
+│   ├── auth/             # Auth components
+│   ├── deal/             # Deal CRUD, pipeline stages, Kanban
+│   ├── import/           # Import wizard, validation, orchestration
+│   ├── kanban-board/     # Reusable Kanban board component
+│   ├── organization/     # Organization CRUD, import
+│   ├── person/           # Person CRUD, import
+│   ├── priority-level/   # Priority utilities
+│   ├── shared/           # Shared actions, utilities, import orchestration
+│   └── user/             # User management
+├── hooks/                # Custom React hooks
+├── lib/                  # Core utilities (Prisma client)
+├── types/                # TypeScript type definitions
+└── generated/            # Prisma generated client
+```
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20+
+- pnpm 9+
+- PostgreSQL database (Neon recommended)
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Clone the repository
+git clone <repository-url>
+cd CRM
+
+# Install dependencies
+pnpm install
+
+# Set up environment variables
+cp .env.example .env.local  # Create from template
+# Edit .env.local with your DATABASE_URL and NEXTAUTH_SECRET
+
+# Set up database
+pnpm db:generate    # Generate Prisma client
+pnpm db:migrate     # Run migrations
+pnpm db:seed        # Seed initial data (optional)
+
+# Start development server
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DATABASE_URL` | Neon/PostgreSQL connection string | Yes |
+| `NEXTAUTH_SECRET` | Secret for NextAuth JWT encryption | Yes |
+| `NEXTAUTH_URL` | Canonical URL (production) | Production only |
 
-## Learn More
+## Database Commands
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Generate Prisma client
+pnpm db:generate
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Run migrations in development
+pnpm db:migrate
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Deploy migrations (production/CI)
+pnpm db:deploy
 
-## Deploy on Vercel
+# Open Prisma Studio
+pnpm db:studio
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Reset database (⚠️ destructive)
+pnpm db:reset
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Seed database
+pnpm db:seed
+```
+
+## Development Commands
+
+```bash
+# Start dev server
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Run linting
+pnpm lint
+
+# Auto-fix linting issues
+pnpm lint:fix
+
+# Format Prisma schema
+pnpm db:format
+```
+
+## Branching & Commits
+
+- **Branches**: `feature/*`, `bugfix/*`, `hotfix/*`, `chore/*`, `release/*`
+- **Commits**: [Conventional Commits](docs/commit-guidelines.md) format
+- **PR Target**: `staging` branch for review, `main` for production
+
+See [Branching Strategy](docs/branching.md) and [Commit Guidelines](docs/commit-guidelines.md) for details.
+
+## Deployment
+
+- **Vercel** (recommended): Connect repository for automatic preview/production deployments
+- **Preview**: Auto-deployed on `staging` branch
+- **Production**: Auto-deployed on `main` branch
+- **Build Command**: `pnpm vercel-build` (runs Prisma generate + migrate + Next.js build)
+
+## Architecture Notes
+
+- **Server Components First**: Pages use RSC by default; client components marked with `'use client'`
+- **Server Actions**: Mutations use Next.js Server Actions with Zod validation
+- **Action Pipeline**: Shared `actionPipeline` wrapper for auth, validation, error handling
+- **Import System**: Async pipeline with progress tracking via `ImportSession` model
+- **Soft Deletes**: All entities use `deletedAt` timestamp; queries filter by default
+- **Optimistic UI**: TanStack Table + Server Actions for responsive data grids
+
+## Contributing
+
+See [Contributing Guide](docs/contributing.md) for coding standards and PR process.
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.

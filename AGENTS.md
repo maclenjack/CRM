@@ -8,22 +8,20 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Project Overview
 
-This repository is a **full‑stack starter** built with the following stack:
+This repository is a **full-stack CRM application** built with the following stack:
 
-- **Next.js (App Router)** – TypeScript, server‑side rendering, and API routes.
-- **Prisma + Neon** – A lightweight ORM with a free PostgreSQL database.
-- **NextAuth** – Authentication via Google, GitHub, and custom credentials.
-- **TailwindCSS** – Utility‑first styling.
-- **Jest** – Unit and component testing.
-- **Playwright** – End‑to‑end testing.
-- **ESLint + Prettier** – Code quality and formatting.
-- **Copilot + Ollama** – Local LLM assistance for rapid development.
+- **Next.js 16 (App Router)** – TypeScript, React 19, Server Components, Server Actions
+- **Prisma 7.8 + Neon** – ORM with serverless PostgreSQL database
+- **NextAuth v5 (beta)** – Authentication via Credentials provider (email/password) with Argon2 hashing
+- **Tailwind CSS v4** – Utility-first styling with custom theme via `@theme`
+- **Radix UI** – Accessible component primitives
+- **TanStack React Table v8** – Data tables with sorting, filtering, pagination
+- **@dnd-kit** – Drag-and-drop for Kanban board
+- **Zod v4** – Schema validation for forms and API
+- **ESLint + Prettier** – Code quality and formatting
+- **Vercel Analytics + Speed Insights** – Performance monitoring
 
-The goal is to provide a production‑ready, CI‑driven workflow that can be
-deployed to Vercel with preview environments for every pull request. Branch
-rules enforce a linear history, require reviews, and protect the `main` and
-`staging` branches. All changes should be made on feature branches following
-the naming convention described in `branching.md`.
+The goal is to provide a production-ready CRM with deals pipeline, contacts management, activities tracking, and data import capabilities. Deployed to Vercel with preview environments for every pull request. Branch rules enforce a linear history, require reviews, and protect the `main` and `staging` branches. All changes should be made on feature branches following the naming convention described in `branching.md`.
 
 ### Import Conventions
 
@@ -42,6 +40,14 @@ the naming convention described in `branching.md`.
 
 	This keeps import paths short and makes it easier to refactor
 	component locations without touching many files.
+
+### Architecture Patterns
+
+* **Server Components First** – Pages use RSC by default; client components marked with `'use client'`
+* **Server Actions** – Mutations use Next.js Server Actions with Zod validation via shared `actionPipeline`
+* **Feature-based Structure** – Domain logic organized under `src/features/{domain}/`
+* **Soft Deletes** – All entities use `deletedAt` timestamp; queries filter by default
+* **Import Pipeline** – Async CSV import with progress tracking via `ImportSession` model
 
 ## Branching and Commit Strategy
 
