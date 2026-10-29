@@ -8,4 +8,9 @@ export const OrganizationFormSchema = z.object({
     .trim(),
 });
 
+export const DeleteOrganizationSchema = z.object({
+  id: z.cuid2('Invalid Organization ID').trim(),
+});
+
 export type OrganizationFormValues = z.infer<typeof OrganizationFormSchema>;
+export type DeleteOrganizationInput = z.infer<typeof DeleteOrganizationSchema>;

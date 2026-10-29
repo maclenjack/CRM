@@ -5,13 +5,12 @@ import { EmptyState } from '@/components/EmptyState';
 import { ModalButton } from '@/components/ModalButton';
 import { RecordTableCard } from '@/components/RecordTableCard';
 import { Button } from '@/components/ui/button';
-import { AddOrganizationModal } from '@/features/organization/components/AddOrganizationModal';
+import { OrganizationModal } from '@/features/organization/components/OrganizationModal';
 import {
   type OrganizationTableSelect,
   organizationsTableSelect,
 } from '@/features/organization/organization';
 import { createOrganization } from '@/features/organization/organization.actions';
-import convertDecimalsToStrings from '@/features/shared/utils/convert-decimals-to-strings';
 import prisma from '@/lib/prisma';
 
 import { OrganizationsTable } from './OrganizationsTable';
@@ -20,15 +19,11 @@ export async function OrganizationsTableWrapper() {
   const session = await auth();
   if (!session?.user) return null;
 
-  const rawOrganizations = await prisma.organization.findMany({
-    where: { ownerId: session.user.id },
-    select: organizationsTableSelect,
-  });
-
-  // Convert Prisma Decimal objects to strings for client-side use
-  const organizations: OrganizationTableSelect[] = convertDecimalsToStrings(
-    rawOrganizations
-  ) as OrganizationTableSelect[];
+  const organizations: OrganizationTableSelect[] =
+    await prisma.organization.findMany({
+      where: { ownerId: session.user.id },
+      select: organizationsTableSelect,
+    });
 
   if (organizations.length === 0) {
     return (
@@ -38,7 +33,7 @@ export async function OrganizationsTableWrapper() {
         icon={Building2Icon}
         action={
           <ModalButton
-            modalComponent={AddOrganizationModal}
+            modalComponent={OrganizationModal}
             modalProps={{ onSubmitSuccess: createOrganization }}
             asChild
           >
