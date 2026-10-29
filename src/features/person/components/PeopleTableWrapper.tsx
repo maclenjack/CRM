@@ -5,13 +5,12 @@ import { EmptyState } from '@/components/EmptyState';
 import { ModalButton } from '@/components/ModalButton';
 import { RecordTableCard } from '@/components/RecordTableCard';
 import { Button } from '@/components/ui/button';
-import { AddPersonModal } from '@/features/person/components/AddPersonModal';
+import { PersonModal } from '@/features/person/components/PersonModal';
 import {
   type PersonTableSelect,
   personTableSelect,
 } from '@/features/person/person';
-import { createPersonAction } from '@/features/person/person.actions';
-import convertDecimalsToStrings from '@/features/shared/utils/convert-decimals-to-strings';
+import { createPerson } from '@/features/person/person.actions';
 import prisma from '@/lib/prisma';
 
 import { PeopleTable } from './PeopleTable';
@@ -20,15 +19,10 @@ export async function PeopleTableWrapper() {
   const session = await auth();
   if (!session?.user) return null;
 
-  const rawPeople = await prisma.person.findMany({
+  const people: PersonTableSelect[] = await prisma.person.findMany({
     where: { ownerId: session.user.id },
     select: personTableSelect,
   });
-
-  // Convert Prisma Decimal objects to strings for client-side use
-  const people: PersonTableSelect[] = convertDecimalsToStrings(
-    rawPeople
-  ) as PersonTableSelect[];
 
   if (people.length === 0) {
     return (
@@ -38,8 +32,8 @@ export async function PeopleTableWrapper() {
         icon={UserIcon}
         action={
           <ModalButton
-            modalComponent={AddPersonModal}
-            modalProps={{ onSubmitSuccess: createPersonAction }}
+            modalComponent={PersonModal}
+            modalProps={{ onSubmitSuccess: createPerson }}
             asChild
           >
             <Button
