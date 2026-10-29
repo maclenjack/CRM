@@ -73,7 +73,7 @@ export function PasswordField<TFieldValues extends FieldValues>({
               </span>
             </Button>
           </div>
-          <FieldError>{fieldState.error?.message}</FieldError>
+          <FieldError errors={[fieldState.error]} />
         </Field>
       )}
     />

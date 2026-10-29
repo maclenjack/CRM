@@ -28,12 +28,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { cn } from '@/features/shared/utils/cn';
 import {
   PINNED_CURRENCY_OPTIONS,
   REMAINING_CURRENCY_OPTIONS,
-  type CurrencyOption,
 } from '@/features/shared/utils/currency';
-import { cn } from '@/features/shared/utils/cn';
 
 interface CurrencyFieldProps<
   TFieldValues extends FieldValues,
@@ -57,7 +56,7 @@ export function CurrencyField<
   className,
 }: CurrencyFieldProps<TFieldValues, TName>) {
   const [open, setOpen] = React.useState(false);
-  const allAvailableCurrencies: CurrencyOption[] = [
+  const allAvailableCurrencies = [
     ...PINNED_CURRENCY_OPTIONS,
     ...REMAINING_CURRENCY_OPTIONS,
   ];
@@ -66,7 +65,7 @@ export function CurrencyField<
     <Controller<TFieldValues, TName>
       control={control}
       name={name}
-      render={({ field }) => (
+      render={({ field, fieldState }) => (
         <Field className={cn('flex flex-col gap-2', className)}>
           <FieldLabel required>{label}</FieldLabel>
 
@@ -101,7 +100,6 @@ export function CurrencyField<
                 <CommandList>
                   <CommandEmpty>No currency found.</CommandEmpty>
 
-                  {/* Pinned Group */}
                   <CommandGroup heading="Pinned">
                     {PINNED_CURRENCY_OPTIONS.map((currency) => (
                       <CommandItem
@@ -138,7 +136,6 @@ export function CurrencyField<
 
                   <CommandSeparator />
 
-                  {/* All Currencies Group */}
                   <CommandGroup heading="All Currencies">
                     {REMAINING_CURRENCY_OPTIONS.map((currency) => (
                       <CommandItem
@@ -177,7 +174,7 @@ export function CurrencyField<
             </PopoverContent>
           </Popover>
 
-          <FieldError />
+          <FieldError errors={[fieldState.error]} />
         </Field>
       )}
     />

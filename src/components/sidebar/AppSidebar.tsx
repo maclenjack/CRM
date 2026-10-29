@@ -12,6 +12,7 @@ import {
   ChevronRight,
   FolderKanban,
   LayoutDashboard,
+  Upload,
   UserIcon,
   UsersIcon,
 } from 'lucide-react';
@@ -254,6 +255,26 @@ export function AppSidebar() {
                 <Link href="/deals">
                   <FolderKanban className="size-4.5 shrink-0" />
                   <span>Deals</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === '/import'}
+                className={clsx(
+                  'w-full transition-all duration-200',
+                  pathname === '/import' &&
+                    `
+                      bg-secondary/15 font-semibold text-secondary
+                      hover:bg-secondary/20
+                    `
+                )}
+              >
+                <Link href="/import">
+                  <Upload className="size-4.5 shrink-0" />
+                  <span>Import</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
