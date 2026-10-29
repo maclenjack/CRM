@@ -7,44 +7,51 @@ import {
 } from '@/generated/prisma/enums';
 
 export const BaseDealSchema = z.object({
-  title: z
+  title: z.string().min(1, 'Title is required').max(200).trim(),
+  value: z
     .string()
-    .min(1, 'Title is required')
-    .max(200, 'Title must be under 200 characters')
-    .trim(),
-  value: z.coerce
-    .number('Value must be a number')
-    .positive('Value must be positive'),
-  currency: z.string().length(3, 'Currency must be a 3‑letter code').trim(),
-
-  note: z
-    .string()
-    .max(1000, 'Notes cannot exceed 1000 characters')
     .trim()
-    .optional()
-    .or(z.literal('')),
+    .min(1, 'Amount is required')
+    .refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
+      message: 'Amount must be a valid positive number',
+    }),
+  currency: z.string().length(3).trim().toUpperCase(),
+  note: z.string().max(1000).trim().optional().or(z.literal('')),
   personId: z.string().min(1, 'Contact person is required').trim(),
   organizationId: z.string().min(1, 'Organization is required').trim(),
-
   stage: z.enum(PipelineStage).optional(),
   status: z.enum(DealStatus).optional(),
   priority: z.enum(PriorityLevel).optional(),
-  expectedCloseDate: z.coerce
-    .date('Expected close date is required')
-    .refine((date) => date >= new Date(new Date().setHours(0, 0, 0, 0)), {
-      message: 'Expected close date cannot be in the past',
-      path: ['expectedCloseDate'],
-    }),
+
+  expectedCloseDate: z.coerce.date().optional().nullable(),
 });
 
-export const DealFormSchema = BaseDealSchema;
+export const CreateDealSchema = BaseDealSchema.refine(
+  (data) => {
+    if (!data.expectedCloseDate) return true;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return data.expectedCloseDate >= today;
+  },
+  {
+    message: 'Expected close date cannot be in the past',
+    path: ['expectedCloseDate'],
+  }
+);
 
-export type DealFormValues = z.infer<typeof DealFormSchema>;
+export const UpdateDealSchema = BaseDealSchema;
+
+export const UpdateDealStatusSchema = z.object({
+  id: z.cuid2('Invalid Deal ID').trim(),
+  status: z.enum(DealStatus),
+});
+
+export const DeleteDealSchema = z.object({
+  id: z.cuid2('Invalid Deal ID').trim(),
+});
+
 export type BaseDealValues = z.infer<typeof BaseDealSchema>;
-
-// Re-export currency options from shared utility
-export {
-  PINNED_CURRENCY_OPTIONS,
-  REMAINING_CURRENCY_OPTIONS,
-  type CurrencyOption,
-} from '@/features/shared/utils/currency';
+export type CreateDealValues = z.infer<typeof CreateDealSchema>;
+export type UpdateDealValues = z.infer<typeof UpdateDealSchema>;
+export type UpdateDealStatusInput = z.infer<typeof UpdateDealStatusSchema>;
+export type DeleteDealInput = z.infer<typeof DeleteDealSchema>;
