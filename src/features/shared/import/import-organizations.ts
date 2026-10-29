@@ -47,55 +47,33 @@ export async function importOrganizations(
 ): Promise<ImportResult['organizations']> {
   const { parseCSVString } = await import('./csv-parser');
   const parseResult = await parseCSVString<Record<string, string>>(csvContent);
-
+  
   // Check for parse errors
   if (parseResult.errors.length > 0) {
-    console.error(
-      '[IMPORT] Organization CSV parse errors:',
-      parseResult.errors
-    );
-    throw new Error(
-      `CSV parse failed: ${parseResult.errors.map((e) => e.message).join(', ')}`
-    );
+    console.error('[IMPORT] Organization CSV parse errors:', parseResult.errors);
+    throw new Error(`CSV parse failed: ${parseResult.errors.map(e => e.message).join(', ')}`);
   }
-
+  
   const rows = parseResult.data;
   if (!rows || rows.length === 0) {
-    console.error(
-      '[IMPORT] Organization CSV parsed 0 rows. First 200 chars:',
-      csvContent.slice(0, 200)
-    );
+    console.error('[IMPORT] Organization CSV parsed 0 rows. First 200 chars:', csvContent.slice(0, 200));
     throw new Error('CSV parsed 0 rows - check file format');
   }
 
   console.log('[IMPORT] Organization CSV parsed rows:', rows.length);
-  console.log(
-    '[IMPORT] Organization CSV first row keys:',
-    Object.keys(rows[0])
-  );
+  console.log('[IMPORT] Organization CSV first row keys:', Object.keys(rows[0]));
 
   const { valid, invalid } = validateAndTransformOrganizations(rows as any[]);
-
-  console.log('[IMPORT] Organization validation:', {
-    valid: valid.length,
-    invalid: invalid.length,
-  });
-
+  
+  console.log('[IMPORT] Organization validation:', { valid: valid.length, invalid: invalid.length });
+  
   if (valid.length === 0 && invalid.length === 0) {
-    console.error(
-      '[IMPORT] No valid or invalid rows after validation. Sample row:',
-      JSON.stringify(rows[0]).slice(0, 500)
-    );
-    throw new Error(
-      'Validation produced no results - check column headers match schema'
-    );
+    console.error('[IMPORT] No valid or invalid rows after validation. Sample row:', JSON.stringify(rows[0]).slice(0, 500));
+    throw new Error('Validation produced no results - check column headers match schema');
   }
-
+  
   if (valid.length === 0) {
-    console.error(
-      '[IMPORT] All organization rows invalid. Errors:',
-      invalid.slice(0, 5).map((i) => i.errors)
-    );
+    console.error('[IMPORT] All organization rows invalid. Errors:', invalid.slice(0, 5).map(i => i.errors));
   }
 
   const recordsToCreate: Array<{
@@ -185,13 +163,7 @@ export async function importOrganizations(
           rawData: org,
         });
         skipped++;
-        if (onProgress)
-          onProgress(i + 1, valid.length, {
-            created,
-            updated,
-            skipped,
-            failed,
-          });
+        if (onProgress) onProgress(i + 1, valid.length, { created, updated, skipped, failed });
         continue;
       }
 
@@ -255,8 +227,7 @@ export async function importOrganizations(
       if (status === ImportRecordStatus.CREATED) created++;
       else if (status === ImportRecordStatus.UPDATED) updated++;
       else if (status === ImportRecordStatus.SKIPPED) skipped++;
-      if (onProgress)
-        onProgress(i + 1, valid.length, { created, updated, skipped, failed });
+      if (onProgress) onProgress(i + 1, valid.length, { created, updated, skipped, failed });
     } catch (error) {
       failed++;
       recordsToCreate.push({

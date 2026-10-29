@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /**
  * Field mapping configuration for transforming Pipedrive CSV columns to internal schema
  */

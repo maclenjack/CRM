@@ -86,18 +86,15 @@ export async function updateImportProgress(
     currentEntityType?: string;
     currentEntityProcessed?: number;
     currentEntityTotal?: number;
-    entityProgress?: Record<
-      string,
-      {
-        total: number;
-        processed: number;
-        percentage: number;
-        created: number;
-        updated: number;
-        skipped: number;
-        failed: number;
-      }
-    >;
+    entityProgress?: Record<string, {
+      total: number;
+      processed: number;
+      percentage: number;
+      created: number;
+      updated: number;
+      skipped: number;
+      failed: number;
+    }>;
   },
   tx?: Prisma.TransactionClient
 ) {

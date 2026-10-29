@@ -169,8 +169,7 @@ export async function importActivities(
         : null;
 
       // Deduplication: check by externalId (Pipedrive ID) - from batch lookup
-      const existingActivity =
-        existingActivitiesByExternalId.get(activity.externalId) || null;
+      const existingActivity = existingActivitiesByExternalId.get(activity.externalId) || null;
 
       let activityId: string;
       let status: ImportRecordStatus;
@@ -192,13 +191,11 @@ export async function importActivities(
         });
 
         // Check if data has actually changed
-        const hasChanges =
+        const hasChanges = 
           currentActivity?.subject !== activity.subject ||
           currentActivity?.type !== activity.type ||
-          (currentActivity?.startDate?.getTime() ?? null) !==
-            (activity.startDate?.getTime() ?? null) ||
-          (currentActivity?.endDate?.getTime() ?? null) !==
-            (activity.endDate?.getTime() ?? null) ||
+          (currentActivity?.startDate?.getTime() ?? null) !== (activity.startDate?.getTime() ?? null) ||
+          (currentActivity?.endDate?.getTime() ?? null) !== (activity.endDate?.getTime() ?? null) ||
           currentActivity?.isDone !== activity.isDone ||
           currentActivity?.dealId !== dealId ||
           currentActivity?.personId !== personId ||
