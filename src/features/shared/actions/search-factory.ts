@@ -9,38 +9,61 @@ const SearchQuerySchema = z
   .max(100, { message: 'Search query too long' })
   .transform((val) => val.replace(/[%_\\]/g, '\\$&'));
 
-export function createSearchAction<TModel>(
-  prismaModel: { findMany: (args: any) => Promise<TModel[]> },
-  options: {
-    searchField: keyof TModel;
-    selectFields: Record<keyof TModel, boolean>;
-    limit?: number;
-  }
-) {
-  return async function search(rawQuery: string) {
+type PrismaDelegate = { findMany: (args: any) => Promise<any> };
+
+export interface SearchActionResult<T> {
+  success: boolean;
+  data?: T[];
+  error?: string;
+  isDefaultData?: boolean;
+}
+
+type CreateSearchActionOptions = {
+  searchField: string;
+  selectFields: Record<string, any>;
+  limit?: number;
+  ownerField?: string | null; // Optional field name for ownership filtering (e.g., 'ownerId', 'userId')
+};
+
+export function createSearchAction<
+  TModel extends Record<string, unknown>,
+  TDelegate extends PrismaDelegate,
+>(prismaModel: TDelegate, options: CreateSearchActionOptions) {
+  return async function search(
+    rawQuery: string
+  ): Promise<SearchActionResult<TModel>> {
     const session = await auth();
 
     if (!session?.user?.id) {
       return { success: false, error: 'Unauthorized: You must be logged in.' };
     }
 
+    const {
+      searchField,
+      selectFields,
+      limit,
+      ownerField = 'ownerId',
+    } = options;
+
     const trimmedQuery = rawQuery?.trim() || '';
 
     try {
       if (trimmedQuery.length < 2) {
-        const defaultResults = await prismaModel.findMany({
-          where: {
-            ownerId: session.user.id,
-          },
-          select: options.selectFields,
-          take: options.limit || 15,
-          orderBy: {
-            createdAt: 'desc',
-          },
+        const whereClause: Record<string, any> = {};
+        if (ownerField) {
+          whereClause[ownerField] = session.user.id;
+        }
+
+        const defaultResults = await (prismaModel as any).findMany({
+          where: whereClause,
+          select: selectFields,
+          take: limit || 15,
+          orderBy: { createdAt: 'desc' },
         });
+
         return {
           success: true,
-          data: defaultResults,
+          data: defaultResults as TModel[],
           isDefaultData: true,
         };
       }
@@ -54,20 +77,23 @@ export function createSearchAction<TModel>(
         };
       }
 
-      const results = await prismaModel.findMany({
-        where: {
-          ownerId: session.user.id,
-          [options.searchField]: {
-            contains: validated.data,
-            mode: 'insensitive',
-          },
-        },
-        select: options.selectFields,
-        take: options.limit || 15,
-        orderBy: { [options.searchField]: 'asc' },
+      const whereClause: Record<string, any> = {};
+      if (ownerField) {
+        whereClause[ownerField] = session.user.id;
+      }
+      whereClause[searchField] = {
+        contains: validated.data,
+        mode: 'insensitive',
+      };
+
+      const results = await (prismaModel as any).findMany({
+        where: whereClause,
+        select: selectFields,
+        take: limit || 15,
+        orderBy: { [searchField]: 'asc' },
       });
 
-      return { success: true, data: results, isDefaultData: false };
+      return { success: true, data: results as TModel[], isDefaultData: false };
     } catch (error) {
       console.error(`CRITICAL: Generic search action failed:`, error);
       return {

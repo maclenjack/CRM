@@ -31,7 +31,8 @@ import {
 import {
   PINNED_CURRENCY_OPTIONS,
   REMAINING_CURRENCY_OPTIONS,
-} from '@/features/deal/deal.validation';
+  type CurrencyOption,
+} from '@/features/shared/utils/currency';
 import { cn } from '@/features/shared/utils/cn';
 
 interface CurrencyFieldProps<
@@ -56,7 +57,7 @@ export function CurrencyField<
   className,
 }: CurrencyFieldProps<TFieldValues, TName>) {
   const [open, setOpen] = React.useState(false);
-  const allAvailableCurrencies = [
+  const allAvailableCurrencies: CurrencyOption[] = [
     ...PINNED_CURRENCY_OPTIONS,
     ...REMAINING_CURRENCY_OPTIONS,
   ];

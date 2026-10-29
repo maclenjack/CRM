@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 import {
-  DealStatusSchema,
-  PipelineStageSchema,
-  PriorityLevelSchema,
-} from '@/generated/zod';
+  DealStatus,
+  PipelineStage,
+  PriorityLevel,
+} from '@/generated/prisma/enums';
 
 export const BaseDealSchema = z.object({
   title: z
@@ -26,9 +26,9 @@ export const BaseDealSchema = z.object({
   personId: z.string().min(1, 'Contact person is required').trim(),
   organizationId: z.string().min(1, 'Organization is required').trim(),
 
-  stage: PipelineStageSchema.optional(),
-  status: DealStatusSchema.optional(),
-  priority: PriorityLevelSchema.optional(),
+  stage: z.enum(PipelineStage).optional(),
+  status: z.enum(DealStatus).optional(),
+  priority: z.enum(PriorityLevel).optional(),
   expectedCloseDate: z.coerce
     .date('Expected close date is required')
     .refine((date) => date >= new Date(new Date().setHours(0, 0, 0, 0)), {
@@ -42,41 +42,9 @@ export const DealFormSchema = BaseDealSchema;
 export type DealFormValues = z.infer<typeof DealFormSchema>;
 export type BaseDealValues = z.infer<typeof BaseDealSchema>;
 
-const allCodes = Intl.supportedValuesOf('currency');
-
-const pinnedCurrencies = ['NZD', 'USD', 'EUR', 'GBP', 'CAD', 'AUD'];
-
-export interface CurrencyOption {
-  value: string;
-  label: string;
-  code: string;
-  name: string;
-  symbol: string;
-}
-
-const formatCurrencyOption = (code: string): CurrencyOption => {
-  const nameFormatter = new Intl.DisplayNames(['en'], { type: 'currency' });
-  const symbolFormatter = new Intl.NumberFormat('en', {
-    style: 'currency',
-    currency: code,
-  });
-
-  const symbol =
-    symbolFormatter.formatToParts(0).find((p) => p.type === 'currency')
-      ?.value || '';
-  const name = nameFormatter.of(code) || '';
-
-  return {
-    value: code,
-    code,
-    name,
-    symbol,
-    label: symbol ? `${code} - ${name} (${symbol})` : `${code} - ${name}`,
-  };
-};
-
-export const PINNED_CURRENCY_OPTIONS =
-  pinnedCurrencies.map(formatCurrencyOption);
-export const REMAINING_CURRENCY_OPTIONS = allCodes
-  .filter((code) => !pinnedCurrencies.includes(code))
-  .map(formatCurrencyOption);
+// Re-export currency options from shared utility
+export {
+  PINNED_CURRENCY_OPTIONS,
+  REMAINING_CURRENCY_OPTIONS,
+  type CurrencyOption,
+} from '@/features/shared/utils/currency';

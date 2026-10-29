@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import {
   PINNED_CURRENCY_OPTIONS,
   REMAINING_CURRENCY_OPTIONS,
-} from '@/features/deal/deal.validation';
+} from '@/features/shared/utils/currency';
 
 interface DealAmountFieldProps<TFieldValues extends FieldValues> {
   control: Control<TFieldValues>;

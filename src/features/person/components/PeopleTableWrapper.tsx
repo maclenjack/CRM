@@ -11,6 +11,7 @@ import {
   personTableSelect,
 } from '@/features/person/person';
 import { createPersonAction } from '@/features/person/person.actions';
+import convertDecimalsToStrings from '@/features/shared/utils/convert-decimals-to-strings';
 import prisma from '@/lib/prisma';
 
 import { PeopleTable } from './PeopleTable';
@@ -19,10 +20,15 @@ export async function PeopleTableWrapper() {
   const session = await auth();
   if (!session?.user) return null;
 
-  const people: PersonTableSelect[] = await prisma.person.findMany({
+  const rawPeople = await prisma.person.findMany({
     where: { ownerId: session.user.id },
     select: personTableSelect,
   });
+
+  // Convert Prisma Decimal objects to strings for client-side use
+  const people: PersonTableSelect[] = convertDecimalsToStrings(
+    rawPeople
+  ) as PersonTableSelect[];
 
   if (people.length === 0) {
     return (
