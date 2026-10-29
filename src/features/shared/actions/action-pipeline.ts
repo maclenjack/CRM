@@ -1,4 +1,5 @@
-import { z } from 'zod';
+// features/shared/actions/action-pipeline.ts
+import z from 'zod';
 
 import { auth } from '@/auth';
 import type { ActionResult } from '@/features/shared/types/action-type';
@@ -11,9 +12,6 @@ interface ActionPipelineOptions<TInput, TData> {
   rawInput: unknown;
   actionName: string;
   handler: (validatedInput: TInput, userId: string) => Promise<TData>;
-  authorize?: (
-    userId: string
-  ) => Promise<{ allowed: boolean; reason?: string }>;
 }
 
 export async function actionPipeline<TInput, TData = { id: string }>({
@@ -21,7 +19,6 @@ export async function actionPipeline<TInput, TData = { id: string }>({
   rawInput,
   actionName,
   handler,
-  authorize,
 }: ActionPipelineOptions<TInput, TData>): Promise<ActionResult<TInput, TData>> {
   // 1. Authentication check
   const session = await auth();
@@ -32,24 +29,7 @@ export async function actionPipeline<TInput, TData = { id: string }>({
 
   const userId = session.user.id;
 
-  // 2. Authorization check (if provided)
-  if (authorize) {
-    const authResult = await authorize(userId);
-    if (!authResult.allowed) {
-      console.warn(`[${actionName}] Authorization failed`, {
-        userId,
-        reason: authResult.reason,
-      });
-      return {
-        success: false,
-        error:
-          authResult.reason ||
-          'Forbidden: You do not have permission to perform this action.',
-      };
-    }
-  }
-
-  // 3. Schema validation
+  // 2. Schema validation
   const parseResult = schema.safeParse(rawInput);
   if (!parseResult.success) {
     const validationErrors = z.treeifyError(parseResult.error);
