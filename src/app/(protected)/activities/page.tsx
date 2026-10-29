@@ -9,7 +9,7 @@ import { TableLoadingPlaceholder } from '@/components/table/TableLoadingPlacehol
 import { Button } from '@/components/ui/button';
 import { createActivity } from '@/features/activity/activity.actions';
 import { ActivitiesTableWrapper } from '@/features/activity/components/ActivitiesTableWrapper';
-import { AddActivityModal } from '@/features/activity/components/AddActivityModal';
+import { ActivityModal } from '@/features/activity/components/ActivityModal';
 
 export default async function ActivitiesPage() {
   const session = await auth();
@@ -22,7 +22,7 @@ export default async function ActivitiesPage() {
       icon={LayoutListIcon}
       actionButton={
         <ModalButton
-          modalComponent={AddActivityModal}
+          modalComponent={ActivityModal}
           modalProps={{ onSubmitSuccess: createActivity }}
           asChild
         >

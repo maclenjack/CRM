@@ -13,6 +13,7 @@ export interface OrganizationsTableData {
 }
 
 export const organizationsTableSelect = {
+  id: true,
   name: true,
   _count: {
     select: {

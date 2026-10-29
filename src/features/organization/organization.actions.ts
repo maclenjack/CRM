@@ -2,43 +2,83 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { auth } from '@/auth';
-import type { OrganizationFormValues } from '@/features/organization/organization.validation';
+import {
+  DeleteOrganizationSchema,
+  OrganizationFormSchema,
+} from '@/features/organization/organization.validation';
+import { actionPipeline } from '@/features/shared/actions/action-pipeline';
 import { createSearchAction } from '@/features/shared/actions/search-factory';
 import type { OrganizationModel } from '@/generated/prisma/models';
 import prisma from '@/lib/prisma';
 
-export const searchOrganizations = createSearchAction<OrganizationModel>(
-  prisma.organization,
-  {
-    searchField: 'name',
-    selectFields: { id: true, name: true } as any,
-    limit: 15,
-  }
-);
+const ORGANIZATIONS_PATH = '/contacts/organizations';
 
-export async function createOrganization(formData: OrganizationFormValues) {
-  const session = await auth();
+export async function createOrganization(rawInput: unknown) {
+  return actionPipeline({
+    schema: OrganizationFormSchema,
+    rawInput,
+    actionName: 'CreateOrganization',
+    handler: async (data, userId) => {
+      await prisma.organization.create({
+        data: {
+          name: data.name,
+          ownerId: userId,
+          createdById: userId,
+          updatedById: userId,
+        },
+      });
 
-  if (!session?.user?.id) {
-    return { success: false, error: 'Unauthorized: You must be logged in.' };
-  }
-
-  try {
-    await prisma.organization.create({
-      data: {
-        name: formData.name,
-        ownerId: session.user.id,
-        createdById: session.user.id,
-        updatedById: session.user.id,
-      },
-    });
-
-    revalidatePath('/contacts/organizations');
-
-    return { success: true };
-  } catch (error) {
-    console.error('Failed to create activity:', error);
-    return { success: false, error: 'Internal Server Error' };
-  }
+      revalidatePath(ORGANIZATIONS_PATH);
+      return { id: 'created' };
+    },
+  });
 }
+
+export async function updateOrganization(id: string, rawInput: unknown) {
+  return actionPipeline({
+    schema: OrganizationFormSchema,
+    rawInput,
+    actionName: 'UpdateOrganization',
+    handler: async (data, userId) => {
+      await prisma.organization.update({
+        where: { id, ownerId: userId },
+        data: {
+          name: data.name,
+          updatedById: userId,
+        },
+      });
+
+      revalidatePath(ORGANIZATIONS_PATH);
+      return { id };
+    },
+  });
+}
+
+export async function deleteOrganization(id: string) {
+  return actionPipeline({
+    schema: DeleteOrganizationSchema,
+    rawInput: { id },
+    actionName: 'DeleteOrganization',
+    handler: async ({ id: orgId }, userId) => {
+      await prisma.organization.update({
+        where: { id: orgId, ownerId: userId },
+        data: {
+          deletedAt: new Date(),
+          updatedById: userId,
+        },
+      });
+
+      revalidatePath(ORGANIZATIONS_PATH);
+      return { id: orgId };
+    },
+  });
+}
+
+export const searchOrganizations = createSearchAction<
+  OrganizationModel,
+  typeof prisma.organization
+>(prisma.organization, {
+  searchField: 'name',
+  selectFields: { id: true, name: true },
+  limit: 15,
+});

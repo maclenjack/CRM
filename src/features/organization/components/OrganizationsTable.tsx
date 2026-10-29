@@ -3,8 +3,12 @@
 import { createColumnHelper } from '@tanstack/react-table';
 import { CalendarIcon, UserIcon } from 'lucide-react';
 
+import { CellEditor } from '@/components/table/CellEditor';
 import { Table } from '@/components/table/Table';
+import { OrganizationRowActions } from '@/features/organization/components/OrganizationRowActions';
 import type { OrganizationTableSelect } from '@/features/organization/organization';
+import { updateOrganization } from '@/features/organization/organization.actions';
+import { OrganizationFormSchema } from '@/features/organization/organization.validation';
 import { findNextOccurringDate } from '@/features/shared/utils/date';
 import { DealStatus } from '@/generated/prisma/enums';
 
@@ -13,11 +17,29 @@ const columns = [
   columnHelper.accessor('name', {
     header: 'Organization Name',
     enableSorting: true,
-    cell: (info) => (
-      <span className="block py-1 font-semibold tracking-tight text-foreground">
-        {info.getValue()}
-      </span>
-    ),
+    cell: (info) => {
+      const organizationId = info.row.original.id;
+      const currentName = info.getValue();
+
+      return (
+        <CellEditor
+          label="Organization Name"
+          placeholder="Enter organization name..."
+          value={currentName}
+          schema={OrganizationFormSchema.shape.name}
+          onSave={async (newName) => {
+            const result = await updateOrganization(organizationId, {
+              name: newName,
+            });
+            if (!result.success) {
+              throw new Error(
+                result.error || 'Failed to update organization name'
+              );
+            }
+          }}
+        />
+      );
+    },
   }),
   columnHelper.accessor('_count', {
     header: 'People',
@@ -92,7 +114,7 @@ const columns = [
           "
         >
           <CalendarIcon className="size-3.5 text-muted-foreground" />
-          {date.toLocaleDateString('en-US', {
+          {date.toLocaleDateString('en-NZ', {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
@@ -109,6 +131,11 @@ const columns = [
         {info.getValue().name}
       </span>
     ),
+  }),
+  columnHelper.display({
+    id: 'actions',
+    header: '',
+    cell: (info) => <OrganizationRowActions organization={info.row.original} />,
   }),
 ];
 

@@ -11,21 +11,21 @@ interface MetricProps {
 
 export async function ContactsCount({ userId }: MetricProps) {
   const count = await prisma.person.count({
-    where: { ownerId: userId, deletedAt: null },
+    where: { ownerId: userId },
   });
   return <>{count.toLocaleString()}</>;
 }
 
 export async function PendingActivitiesCount({ userId }: MetricProps) {
   const count = await prisma.activity.count({
-    where: { ownerId: userId, done: false, deletedAt: null },
+    where: { ownerId: userId, isDone: false },
   });
   return <>{count} pending</>;
 }
 
 export async function PipelineValue({ userId }: MetricProps) {
   const aggregate = await prisma.deal.aggregate({
-    where: { ownerId: userId, status: 'OPEN', deletedAt: null },
+    where: { ownerId: userId, status: 'OPEN' },
     _sum: { value: true },
   });
   const value = aggregate._sum.value || 0;
@@ -35,7 +35,7 @@ export async function PipelineValue({ userId }: MetricProps) {
 export async function RecentActivityStream({ userId }: MetricProps) {
   const rawRecentActivities = await prisma.activity.findMany({
     take: 3,
-    where: { ownerId: userId, done: false, deletedAt: null },
+    where: { ownerId: userId, isDone: false },
     orderBy: { createdAt: 'desc' },
     include: { contactPerson: true },
   });

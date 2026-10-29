@@ -1,4 +1,4 @@
-import { LogOut, Mail, User } from 'lucide-react';
+import { AlertTriangle, LogOut, Mail, Trash2, User } from 'lucide-react';
 
 import { auth, signOut } from '@/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,6 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { HardDeleteUserForm } from '@/features/user/components/HardDeleteUserForm';
+import { DeleteAllDataButton } from '@/features/user/components/DeleteAllDataButton';
 
 export default async function UserPage() {
   const session = await auth();
@@ -155,6 +157,48 @@ export default async function UserPage() {
                 </Button>
               </form>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Hard Delete User Section - Admin Only */}
+        <Card className="overflow-hidden border-red-200 bg-card shadow-sm">
+          <CardHeader className="border-b border-border/50 bg-red-50 py-6">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="size-6 text-red-600" />
+              <div>
+                <CardTitle className="text-xl text-red-700">
+                  Danger Zone
+                </CardTitle>
+                <CardDescription className="text-red-600">
+                  Permanently delete a user account. This action cannot be
+                  undone.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <HardDeleteUserForm />
+          </CardContent>
+        </Card>
+
+        {/* Delete All Data Section - Admin Only */}
+        <Card className="overflow-hidden border-red-300 bg-card shadow-sm">
+          <CardHeader className="border-b border-border/50 bg-red-100 py-6">
+            <div className="flex items-center gap-3">
+              <Trash2 className="size-6 text-red-700" />
+              <div>
+                <CardTitle className="text-xl text-red-800">
+                  Nuclear Option
+                </CardTitle>
+                <CardDescription className="text-red-700">
+                  Delete ALL CRM data (organizations, people, deals, activities, etc.).
+                  This action CANNOT be undone.
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-6">
+            <DeleteAllDataButton />
           </CardContent>
         </Card>
       </div>

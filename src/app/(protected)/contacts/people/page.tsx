@@ -6,9 +6,9 @@ import { CRMPageShell } from '@/components/CRMPageShell';
 import { ModalButton } from '@/components/ModalButton';
 import { TableLoadingPlaceholder } from '@/components/table/TableLoadingPlaceholder';
 import { Button } from '@/components/ui/button';
-import { AddPersonModal } from '@/features/person/components/AddPersonModal';
 import { PeopleTableWrapper } from '@/features/person/components/PeopleTableWrapper';
-import { createPersonAction } from '@/features/person/person.actions';
+import { PersonModal } from '@/features/person/components/PersonModal';
+import { createPerson } from '@/features/person/person.actions';
 
 export default function PeoplePage() {
   return (
@@ -18,8 +18,8 @@ export default function PeoplePage() {
       icon={UserIcon}
       actionButton={
         <ModalButton
-          modalComponent={AddPersonModal}
-          modalProps={{ onSubmitSuccess: createPersonAction }}
+          modalComponent={PersonModal}
+          modalProps={{ onSubmitSuccess: createPerson }}
           asChild
         >
           <Button size="sm" className="gap-2 font-medium shadow-sm">

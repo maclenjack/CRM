@@ -4,7 +4,6 @@ import eslintConfigNextCoreWebVitals from 'eslint-config-next/core-web-vitals';
 import eslintConfigNextTypescript from 'eslint-config-next/typescript';
 import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss';
 import esLintPluginCompat from 'eslint-plugin-compat';
-import eslintPluginJest from 'eslint-plugin-jest';
 import eslintPluginPlaywright from 'eslint-plugin-playwright';
 import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
 import eslintPluginReact from 'eslint-plugin-react';
@@ -17,6 +16,7 @@ import typescriptEslint from 'typescript-eslint';
 export default typescriptEslint.config([
   {
     ignores: [
+      '.history',
       '.next/**',
       'out/**',
       'build/**',
@@ -80,10 +80,7 @@ export default typescriptEslint.config([
   },
   {
     files: ['tests/components/**'],
-    extends: [
-      eslintPluginJest.configs.recommended,
-      eslintPluginTestingLibrary.configs.react,
-    ],
+    extends: [eslintPluginTestingLibrary.configs.react],
   },
   {
     files: ['**/*.md'],

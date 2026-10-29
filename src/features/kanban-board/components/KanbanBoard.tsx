@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import type {
@@ -13,11 +13,12 @@ import {
   DragOverlay,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   closestCorners,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { toast } from 'sonner';
 
 import { KanbanColumn } from '@/features/kanban-board/components/KanbanColumn';
@@ -25,6 +26,10 @@ import type {
   KanbanCardData,
   KanbanColumnData,
 } from '@/features/kanban-board/kanban-board.types';
+import {
+  computeCardPosition,
+  getUpdatedColumnCards,
+} from '@/features/kanban-board/kanban-board.utils';
 import {
   type MoveCardInput,
   MoveCardSchema,
@@ -39,47 +44,6 @@ interface KanbanBoardProps<T extends KanbanCardData> {
   renderCard: (card: T, isOverlay?: boolean) => React.ReactNode;
 }
 
-function computeCardPosition<T extends KanbanCardData>(
-  prevCard: T | undefined,
-  nextCard: T | undefined
-): number {
-  if (prevCard && nextCard) {
-    return (prevCard.position + nextCard.position) / 2;
-  }
-  if (prevCard) {
-    return prevCard.position + 1000;
-  }
-  if (nextCard) {
-    return nextCard.position - 1000;
-  }
-  return 1000;
-}
-
-function getUpdatedColumnCards<T extends KanbanCardData>(
-  cards: T[],
-  columnCards: T[],
-  activeId: string,
-  targetColumnId: string,
-  activeIndex: number,
-  targetIndex: number
-): T[] {
-  if (activeIndex !== -1) {
-    return arrayMove(columnCards, activeIndex, targetIndex);
-  }
-
-  const cardToInsert = cards.find((c) => c.id === activeId);
-  if (cardToInsert) {
-    const updated = [...columnCards];
-    updated.splice(targetIndex, 0, {
-      ...cardToInsert,
-      columnId: targetColumnId,
-    });
-    return updated;
-  }
-
-  return [...columnCards];
-}
-
 export function KanbanBoard<T extends KanbanCardData>({
   initialColumns,
   initialCards,
@@ -89,7 +53,10 @@ export function KanbanBoard<T extends KanbanCardData>({
   const [prevInitialCards, setPrevInitialCards] = useState<T[]>(initialCards);
   const [cards, setCards] = useState<T[]>(initialCards);
 
-  if (initialCards !== prevInitialCards) {
+  const initialCardsKey = JSON.stringify(initialCards);
+  const prevInitialCardsKey = JSON.stringify(prevInitialCards);
+
+  if (initialCardsKey !== prevInitialCardsKey) {
     setCards(initialCards);
     setPrevInitialCards(initialCards);
   }
@@ -107,6 +74,9 @@ export function KanbanBoard<T extends KanbanCardData>({
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
+    }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
@@ -123,10 +93,20 @@ export function KanbanBoard<T extends KanbanCardData>({
     return map;
   }, [cards, columns]);
 
+  const cardSnapshotsRef = useRef<
+    Map<string, { columnId: string; position: number }>
+  >(new Map());
+
   const handleDragStart = (event: DragStartEvent) => {
-    const { active } = event;
-    const card = active.data.current?.card as T;
-    if (card) setActiveCard(card);
+    const card = event.active.data.current?.card as T | undefined;
+    if (!card) return;
+
+    cardSnapshotsRef.current.set(card.id, {
+      columnId: card.columnId,
+      position: card.position,
+    });
+
+    setActiveCard(card);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
@@ -166,14 +146,13 @@ export function KanbanBoard<T extends KanbanCardData>({
     if (!over) return;
 
     const activeId = active.id.toString();
+    const initialCardState = cardSnapshotsRef.current.get(activeId);
     const overId = over.id.toString();
     const isOverACard = over.data.current?.type === 'Card';
 
     const targetColumnId = isOverACard
       ? (over.data.current?.card as T).columnId
       : overId;
-
-    const rollbackCardsState = [...cards];
 
     const columnCards = [...cards]
       .filter((c) => c.columnId === targetColumnId)
@@ -210,7 +189,7 @@ export function KanbanBoard<T extends KanbanCardData>({
     const validation = MoveCardSchema.safeParse({
       cardId: activeId,
       targetColumnId,
-      targetPosition: computedPosition,
+      ...computedPosition,
     });
 
     if (!validation.success) {
@@ -226,7 +205,7 @@ export function KanbanBoard<T extends KanbanCardData>({
           ? {
               ...card,
               columnId: validatedPayload.targetColumnId,
-              position: validatedPayload.targetPosition,
+              position: validatedPayload.position,
             }
           : card
       )
@@ -236,10 +215,25 @@ export function KanbanBoard<T extends KanbanCardData>({
       const response = await onCardMoved(validatedPayload);
       if (!response.success) throw new Error(response.error || 'Server error');
       toast.success('Board updated');
+      cardSnapshotsRef.current.delete(activeId);
     } catch (err) {
-      toast.error('Failed to save arrangement');
       console.error(err);
-      setCards(rollbackCardsState);
+      toast.error('Could not save card position. Rolling back changes.');
+
+      if (initialCardState) {
+        setCards((prev) =>
+          prev.map((c) =>
+            c.id === activeId
+              ? {
+                  ...c,
+                  columnId: initialCardState.columnId,
+                  position: initialCardState.position,
+                }
+              : c
+          )
+        );
+      }
+      cardSnapshotsRef.current.delete(activeId);
     }
   };
 
