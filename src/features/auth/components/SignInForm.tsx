@@ -27,7 +27,7 @@ import {
 } from '@/components/ui/item';
 import { Separator } from '@/components/ui/separator';
 import { signIn } from '@/features/auth/auth.actions';
-import { signInSchema } from '@/schemas/user.schema';
+import { signInSchema } from '@/features/auth/auth.validation';
 
 export function SignInForm() {
   const [isPending, startTransition] = useTransition();
@@ -92,7 +92,7 @@ export function SignInForm() {
                       field.onChange(cleanValue);
                     }}
                   />
-                  <FieldError>{fieldState.error?.message}</FieldError>
+                  <FieldError errors={[fieldState.error]} />
                 </Field>
               )}
             />
@@ -112,7 +112,7 @@ export function SignInForm() {
               className="animate-in duration-200 fade-in-50"
             >
               <AlertCircle className="size-4" />
-              <AlertTitle>Registration Failed</AlertTitle>
+              <AlertTitle>Sign In Failed</AlertTitle>
               <AlertDescription>
                 {form.formState.errors.root.message}
               </AlertDescription>
@@ -134,7 +134,7 @@ export function SignInForm() {
                 <Link
                   href="/register"
                   className="
-                    text-primary-600
+                    text-primary
                     hover:underline
                   "
                 >

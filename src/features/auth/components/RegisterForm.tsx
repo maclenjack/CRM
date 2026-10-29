@@ -93,7 +93,7 @@ export function RegisterForm() {
                     placeholder="John Doe"
                     autoComplete="name"
                   />
-                  <FieldError>{fieldState.error?.message}</FieldError>
+                  <FieldError errors={[fieldState.error]} />
                 </Field>
               )}
             />
@@ -116,7 +116,7 @@ export function RegisterForm() {
                       field.onChange(cleanValue);
                     }}
                   />
-                  <FieldError>{fieldState.error?.message}</FieldError>
+                  <FieldError errors={[fieldState.error]} />
                 </Field>
               )}
             />
