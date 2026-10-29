@@ -10,7 +10,7 @@ import {
   createImportRecord,
   createImportSession,
   updateImportSession,
-} from '@/features/shared/import';
+} from '@/features/shared/import/import-session';
 import {
   parseCSVString,
   validateHeaders,

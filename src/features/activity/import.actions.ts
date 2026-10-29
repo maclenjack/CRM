@@ -5,10 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { actionPipeline } from '@/features/shared/actions/action-pipeline';
-import {
-  buildExternalIdMap,
-  createImportRecord,
-} from '@/features/shared/import';
+import { buildExternalIdMap, createImportRecord } from '@/features/shared/import/import-session';
 import { parseCSVString } from '@/features/shared/import/csv-parser';
 import { ImportActivitiesSchema } from '@/features/shared/import/import-validation';
 import {
