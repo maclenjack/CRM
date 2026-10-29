@@ -11,20 +11,18 @@ import {
 } from '@/features/activity/activity';
 import { createActivity } from '@/features/activity/activity.actions';
 import { ActivitiesTable } from '@/features/activity/components/ActivitiesTable';
-import { AddActivityModal } from '@/features/activity/components/AddActivityModal';
-import prisma from '@/lib/prisma';import convertDecimalsToStrings from '@/features/shared/utils/convert-decimals-to-strings';
+import { ActivityModal } from '@/features/activity/components/ActivityModal';
+import prisma from '@/lib/prisma';
+
 export async function ActivitiesTableWrapper() {
   const session = await auth();
   if (!session?.user) return null;
 
-  const rawActivities = await prisma.activity.findMany({
-      where: { ownerId: session.user.id },
-      select: activityTableSelect,
-      orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
-    });
-
-    // Convert Prisma Decimal objects to strings for client-side use
-    const activities: ActivityTableSelect[] = convertDecimalsToStrings(rawActivities) as ActivityTableSelect[];
+  const activities: ActivityTableSelect[] = await prisma.activity.findMany({
+    where: { ownerId: session.user.id },
+    select: activityTableSelect,
+    orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+  });
 
   if (activities.length === 0) {
     return (
@@ -34,7 +32,7 @@ export async function ActivitiesTableWrapper() {
         icon={LayoutListIcon}
         action={
           <ModalButton
-            modalComponent={AddActivityModal}
+            modalComponent={ActivityModal}
             modalProps={{ onSubmitSuccess: createActivity }}
             asChild
           >

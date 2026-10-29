@@ -2,126 +2,124 @@
 
 import { revalidatePath } from 'next/cache';
 
-import { auth } from '@/auth';
-import { ActivityFormSchema } from '@/features/activity/activity.validation';
+import {
+  ActivityFormSchema,
+  DeleteActivitySchema,
+  UpdateActivitySchema,
+} from '@/features/activity/activity.validation';
+import { actionPipeline } from '@/features/shared/actions/action-pipeline';
 import prisma from '@/lib/prisma';
 
 export async function createActivity(rawInput: unknown) {
-  const session = await auth();
+  return actionPipeline({
+    schema: ActivityFormSchema,
+    rawInput,
+    actionName: 'createActivity',
+    handler: async (data, userId) => {
+      const created = await prisma.activity.create({
+        data: {
+          subject: data.subject,
+          type: data.type,
+          priority: data.priority,
+          startDate: data.startDateTime,
+          endDate: data.endDateTime,
+          dealId: data.dealId,
+          personId: data.personId,
+          organizationId: data.organizationId,
+          ownerId: userId,
+          createdById: userId,
+          updatedById: userId,
+          notes: data.note
+            ? {
+                create: {
+                  content: data.note,
+                  createdById: userId,
+                  updatedById: userId,
+                },
+              }
+            : undefined,
+        },
+      });
 
-  if (!session?.user?.id) {
-    return { success: false, error: 'Unauthorized: You must be logged in.' };
-  }
+      revalidatePath('/activities');
 
-  const parseResult = ActivityFormSchema.safeParse(rawInput);
-
-  if (!parseResult.success) {
-    return {
-      success: false,
-      error: 'Validation failed',
-      validationErrors: parseResult.error.flatten().fieldErrors,
-    };
-  }
-
-  const data = parseResult.data;
-
-  try {
-    await prisma.activity.create({
-      data: {
-        subject: data.subject,
-        type: data.type,
-        priority: data.priority,
-        startDate: data.startDateTime,
-        endDate: data.endDateTime,
-        dealId: data.dealId,
-        personId: data.personId,
-        organizationId: data.organizationId,
-        ownerId: session.user.id,
-        createdById: session.user.id,
-        updatedById: session.user.id,
-        notes: data.note
-          ? {
-              create: {
-                content: data.note,
-                createdById: session.user.id,
-                updatedById: session.user.id,
-              },
-            }
-          : undefined,
-      },
-    });
-
-    revalidatePath('/activities');
-
-    return { success: true };
-  } catch (error) {
-    console.error('Failed to create activity:', error);
-    return { success: false, error: 'Internal Server Error' };
-  }
+      return { id: created.id };
+    },
+  });
 }
 
-export async function updateActivity(id: string, rawInput: unknown) {
-  const session = await auth();
+export async function updateActivity(id: string, payload: unknown) {
+  return actionPipeline({
+    schema: UpdateActivitySchema,
+    rawInput:
+      typeof payload === 'object' && payload !== null
+        ? { ...payload, id }
+        : { id },
+    actionName: 'updateActivity',
+    handler: async (validatedInput, userId) => {
+      const {
+        id: activityId,
+        startDateTime,
+        endDateTime,
+        note,
+        startDate,
+        endDate,
+        ...rest
+      } = validatedInput;
 
-  if (!session?.user?.id) {
-    return { success: false, error: 'Unauthorized: You must be logged in.' };
-  }
+      const finalStartDate = startDateTime ?? startDate;
+      const finalEndDate = endDateTime ?? endDate;
 
-  const parseResult = ActivityFormSchema.partial().safeParse(rawInput);
+      const updated = await prisma.activity.update({
+        where: {
+          id: activityId,
+          ownerId: userId,
+        },
+        data: {
+          ...rest,
+          ...(finalStartDate && { startDate: finalStartDate }),
+          ...(finalEndDate && { endDate: finalEndDate }),
+          updatedById: userId,
+          ...(note !== undefined &&
+            note !== '' && {
+              notes: {
+                create: {
+                  content: note,
+                  createdById: userId,
+                  updatedById: userId,
+                },
+              },
+            }),
+        },
+      });
 
-  if (!parseResult.success) {
-    return {
-      success: false,
-      error: 'Validation failed',
-      validationErrors: parseResult.error.flatten().fieldErrors,
-    };
-  }
+      revalidatePath('/activities');
 
-  const data = parseResult.data;
-
-  try {
-    await prisma.activity.update({
-      where: { id, ownerId: session.user.id },
-      data: {
-        subject: data.subject,
-        type: data.type,
-        priority: data.priority,
-        startDate: data.startDateTime,
-        endDate: data.endDateTime,
-        dealId: data.dealId,
-        personId: data.personId,
-        organizationId: data.organizationId,
-        isDone: data.isDone,
-        updatedById: session.user.id,
-      },
-    });
-
-    revalidatePath('/activities');
-
-    return { success: true };
-  } catch (error) {
-    console.error('Failed to update activity:', error);
-    return { success: false, error: 'Internal Server Error' };
-  }
+      return { id: updated.id };
+    },
+  });
 }
 
 export async function deleteActivity(id: string) {
-  const session = await auth();
+  return actionPipeline({
+    schema: DeleteActivitySchema,
+    rawInput: { id },
+    actionName: 'deleteActivity',
+    handler: async ({ id: activityId }, userId) => {
+      const deleted = await prisma.activity.update({
+        where: {
+          id: activityId,
+          ownerId: userId,
+        },
+        data: {
+          deletedAt: new Date(),
+          updatedById: userId,
+        },
+      });
 
-  if (!session?.user?.id) {
-    return { success: false, error: 'Unauthorized: You must be logged in.' };
-  }
+      revalidatePath('/activities');
 
-  try {
-    await prisma.activity.delete({
-      where: { id, ownerId: session.user.id },
-    });
-
-    revalidatePath('/activities');
-
-    return { success: true };
-  } catch (error) {
-    console.error('Failed to delete activity:', error);
-    return { success: false, error: 'Internal Server Error' };
-  }
+      return { id: deleted.id };
+    },
+  });
 }
