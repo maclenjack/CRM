@@ -1,4 +1,11 @@
+import type { Metadata } from 'next';
+
 import { ImportWizard } from '@/features/import/components/ImportWizard';
+
+export const metadata: Metadata = {
+  title: 'Import Data - CRM',
+  description: 'Import Pipedrive data from CSV files',
+};
 
 export default function ImportPage() {
   return (

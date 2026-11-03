@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 
 import { KanbanSquareIcon, PlusIcon } from 'lucide-react';
 
@@ -10,6 +11,11 @@ import { DealKanbanWrapper } from '@/features/deal/components/DealKanbanWrapper'
 import { DealModal } from '@/features/deal/components/DealModal';
 import { createDeal } from '@/features/deal/deal.actions';
 import { KanbanLoadingPlaceholder } from '@/features/kanban-board/components/KanbanLoadingPlaceholder';
+
+export const metadata: Metadata = {
+  title: 'Pipeline - CRM',
+  description: 'Track sales pipelines and negotiations',
+};
 
 export default async function DealsPage() {
   const session = await auth();

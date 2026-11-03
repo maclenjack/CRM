@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 
 import { LayoutListIcon, PlusIcon } from 'lucide-react';
 
@@ -10,6 +11,11 @@ import { Button } from '@/components/ui/button';
 import { createActivity } from '@/features/activity/activity.actions';
 import { ActivitiesTableWrapper } from '@/features/activity/components/ActivitiesTableWrapper';
 import { ActivityModal } from '@/features/activity/components/ActivityModal';
+
+export const metadata: Metadata = {
+  title: 'Activities - CRM',
+  description: 'Log and track tasks, calls, and meetings',
+};
 
 export default async function ActivitiesPage() {
   const session = await auth();

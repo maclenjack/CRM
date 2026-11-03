@@ -1,4 +1,5 @@
 import { AlertTriangle, LogOut, Mail, Trash2, User } from 'lucide-react';
+import type { Metadata } from 'next';
 
 import { auth, signOut } from '@/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,6 +13,11 @@ import {
 } from '@/components/ui/card';
 import { HardDeleteUserForm } from '@/features/user/components/HardDeleteUserForm';
 import { DeleteAllDataButton } from '@/features/user/components/DeleteAllDataButton';
+
+export const metadata: Metadata = {
+  title: 'Account Settings - CRM',
+  description: 'Manage your profile and authentication',
+};
 
 export default async function UserPage() {
   const session = await auth();

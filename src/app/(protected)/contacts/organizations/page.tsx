@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 
 import { Building2Icon, PlusIcon } from 'lucide-react';
 
@@ -9,6 +10,11 @@ import { Button } from '@/components/ui/button';
 import { OrganizationModal } from '@/features/organization/components/OrganizationModal';
 import { OrganizationsTableWrapper } from '@/features/organization/components/OrganizationsTableWrapper';
 import { createOrganization } from '@/features/organization/organization.actions';
+
+export const metadata: Metadata = {
+  title: 'Organizations - CRM',
+  description: 'Manage corporate accounts and partnerships',
+};
 
 export default function OrganizationsPage() {
   return (
