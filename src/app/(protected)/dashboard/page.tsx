@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 
 import {
   Activity,
@@ -25,6 +26,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+
+export const metadata: Metadata = {
+  title: 'Dashboard - CRM',
+  description: 'Overview of your CRM workspace',
+};
 
 export default async function DashboardPage() {
   const session = await auth();

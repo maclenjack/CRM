@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
 
 import { PlusIcon, UserIcon } from 'lucide-react';
 
@@ -9,6 +10,11 @@ import { Button } from '@/components/ui/button';
 import { PeopleTableWrapper } from '@/features/person/components/PeopleTableWrapper';
 import { PersonModal } from '@/features/person/components/PersonModal';
 import { createPerson } from '@/features/person/person.actions';
+
+export const metadata: Metadata = {
+  title: 'People - CRM',
+  description: 'Manage individual client relationships',
+};
 
 export default function PeoplePage() {
   return (
