@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import { AlertTriangle, LogOut, Mail, Trash2, User } from 'lucide-react';
 
 import { auth, signOut } from '@/auth';
@@ -10,8 +12,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { HardDeleteUserForm } from '@/features/user/components/HardDeleteUserForm';
 import { DeleteAllDataButton } from '@/features/user/components/DeleteAllDataButton';
+import { HardDeleteUserForm } from '@/features/user/components/HardDeleteUserForm';
+
+export const metadata: Metadata = {
+  title: 'Account Settings - CRM',
+  description: 'Manage your profile and authentication',
+};
 
 export default async function UserPage() {
   const session = await auth();
@@ -191,8 +198,8 @@ export default async function UserPage() {
                   Nuclear Option
                 </CardTitle>
                 <CardDescription className="text-red-700">
-                  Delete ALL CRM data (organizations, people, deals, activities, etc.).
-                  This action CANNOT be undone.
+                  Delete ALL CRM data (organizations, people, deals, activities,
+                  etc.). This action CANNOT be undone.
                 </CardDescription>
               </div>
             </div>

@@ -55,18 +55,56 @@ export async function POST(request: NextRequest) {
       : undefined;
 
     // Calculate totals and seed initial progress BEFORE starting pipeline
-    const { calculateTotalRecords, getEntityCount } = await import('@/features/shared/import/orchestrator');
-    const totalRecords = await calculateTotalRecords(organizationsCsv, peopleCsv, dealsCsv, activitiesCsv);
+    const { calculateTotalRecords, getEntityCount } =
+      await import('@/features/shared/import/orchestrator');
+    const totalRecords = await calculateTotalRecords(
+      organizationsCsv,
+      peopleCsv,
+      dealsCsv,
+      activitiesCsv
+    );
     const orgTotal = await getEntityCount(organizationsCsv);
     const peopleTotal = await getEntityCount(peopleCsv);
     const dealsTotal = await getEntityCount(dealsCsv);
     const activitiesTotal = await getEntityCount(activitiesCsv);
 
     const initialEntityProgress = {
-      ORGANIZATION: { total: orgTotal, processed: 0, percentage: 0, created: 0, updated: 0, skipped: 0, failed: 0 },
-      PERSON: { total: peopleTotal, processed: 0, percentage: 0, created: 0, updated: 0, skipped: 0, failed: 0 },
-      DEAL: { total: dealsTotal, processed: 0, percentage: 0, created: 0, updated: 0, skipped: 0, failed: 0 },
-      ACTIVITY: { total: activitiesTotal, processed: 0, percentage: 0, created: 0, updated: 0, skipped: 0, failed: 0 },
+      ORGANIZATION: {
+        total: orgTotal,
+        processed: 0,
+        percentage: 0,
+        created: 0,
+        updated: 0,
+        skipped: 0,
+        failed: 0,
+      },
+      PERSON: {
+        total: peopleTotal,
+        processed: 0,
+        percentage: 0,
+        created: 0,
+        updated: 0,
+        skipped: 0,
+        failed: 0,
+      },
+      DEAL: {
+        total: dealsTotal,
+        processed: 0,
+        percentage: 0,
+        created: 0,
+        updated: 0,
+        skipped: 0,
+        failed: 0,
+      },
+      ACTIVITY: {
+        total: activitiesTotal,
+        processed: 0,
+        percentage: 0,
+        created: 0,
+        updated: 0,
+        skipped: 0,
+        failed: 0,
+      },
     };
 
     // Seed initial progress in database BEFORE starting pipeline
@@ -99,7 +137,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       sessionId: importSession.id,
       status: 'started',
-      message: 'Import started. Poll /api/import/status/[sessionId] for progress.',
+      message:
+        'Import started. Poll /api/import/status/[sessionId] for progress.',
     });
   } catch (error) {
     console.error('Import execution error:', error);

@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 import {
-  ENTITY_TYPES,
-  type EntityKey,
   type CsvFile,
   ENTITY_ICONS,
+  ENTITY_TYPES,
+  type EntityKey,
 } from '../import.types';
 
 const { ArrowLeft, ArrowRight, Loader2 } = ENTITY_ICONS;
@@ -38,8 +38,7 @@ export function ImportConfirm({
             <div
               key={key}
               className="
-                flex items-center justify-between rounded-sm bg-gray-50
-                p-3
+                flex items-center justify-between rounded-sm bg-gray-50 p-3
               "
             >
               <span className="font-medium">{label}</span>

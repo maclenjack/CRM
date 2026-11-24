@@ -31,7 +31,9 @@ export function DeleteAllDataButton() {
         setError('Failed to delete all data');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete all data');
+      setError(
+        err instanceof Error ? err.message : 'Failed to delete all data'
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -39,13 +41,18 @@ export function DeleteAllDataButton() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-3 p-4 rounded-lg border border-red-200 bg-red-50">
-        <AlertTriangle className="size-6 text-red-600 shrink-0" />
+      <div
+        className="
+          flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4
+        "
+      >
+        <AlertTriangle className="size-6 shrink-0 text-red-600" />
         <div className="flex-1">
           <h4 className="font-medium text-red-700">Delete ALL CRM Data</h4>
-          <p className="text-sm text-red-600 mt-1">
-            This will permanently delete ALL organizations, people, deals, activities, 
-            notes, labels, and import records. This action CANNOT be undone.
+          <p className="mt-1 text-sm text-red-600">
+            This will permanently delete ALL organizations, people, deals,
+            activities, notes, labels, and import records. This action CANNOT be
+            undone.
           </p>
         </div>
       </div>
@@ -67,7 +74,10 @@ export function DeleteAllDataButton() {
           variant="destructive"
           disabled={isDeleting}
           onClick={handleDelete}
-          className="bg-red-700 hover:bg-red-800 border-red-600"
+          className="
+            border-red-600 bg-red-700
+            hover:bg-red-800
+          "
         >
           {isDeleting ? (
             <>

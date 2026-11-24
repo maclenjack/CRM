@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 import {
-  ENTITY_TYPES,
-  type EntityKey,
   type CsvFile,
   ENTITY_ICONS,
+  ENTITY_TYPES,
+  type EntityKey,
 } from '../import.types';
 
 const { ArrowLeft, ArrowRight, FileText } = ENTITY_ICONS;
@@ -31,8 +31,8 @@ export function ImportPreview({
   return (
     <div className="space-y-4">
       <p className="text-muted-foreground">
-        Review the validation results for each file. Fix any errors
-        before proceeding.
+        Review the validation results for each file. Fix any errors before
+        proceeding.
       </p>
       <div className="space-y-4">
         {ENTITY_TYPES.map(({ key, label, icon: Icon }) => {
@@ -48,17 +48,13 @@ export function ImportPreview({
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge
-                    variant={
-                      fileData.validCount > 0 ? 'default' : 'secondary'
-                    }
+                    variant={fileData.validCount > 0 ? 'default' : 'secondary'}
                   >
                     {fileData.validCount} valid
                   </Badge>
                   <Badge
                     variant={
-                      fileData.invalidCount > 0
-                        ? 'destructive'
-                        : 'secondary'
+                      fileData.invalidCount > 0 ? 'destructive' : 'secondary'
                     }
                   >
                     {fileData.invalidCount} errors
@@ -75,8 +71,7 @@ export function ImportPreview({
                           <th
                             key={col}
                             className="
-                              p-2 text-left font-medium
-                              text-muted-foreground
+                              p-2 text-left font-medium text-muted-foreground
                             "
                           >
                             {col}
@@ -125,9 +120,7 @@ export function ImportPreview({
                         </li>
                       ))}
                     {fileData.errors.length > 5 && (
-                      <li>
-                        ... and {fileData.errors.length - 5} more errors
-                      </li>
+                      <li>... and {fileData.errors.length - 5} more errors</li>
                     )}
                   </ul>
                 </div>
@@ -141,10 +134,7 @@ export function ImportPreview({
           <ArrowLeft className="mr-2 size-4" />
           Back
         </Button>
-        <Button
-          onClick={onContinue}
-          disabled={!allValidated || !hasFiles}
-        >
+        <Button onClick={onContinue} disabled={!allValidated || !hasFiles}>
           <ArrowRight className="ml-2 size-4" />
           Continue to Import
         </Button>

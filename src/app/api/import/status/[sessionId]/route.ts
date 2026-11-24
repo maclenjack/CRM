@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { auth } from '@/auth';
-import { getImportRecordCounts, getImportSession } from '@/features/shared/import/import-session';
+import {
+  getImportRecordCounts,
+  getImportSession,
+} from '@/features/shared/import/import-session';
 import {
   ImportEntityType,
   ImportRecordStatus,
@@ -113,15 +116,18 @@ export async function GET(
 
     // Override with real-time progress from DB entityProgress JSON if available
     if (importSession.entityProgress) {
-      const dbEntityProgress = importSession.entityProgress as Record<string, {
-        total: number;
-        processed: number;
-        percentage: number;
-        created: number;
-        updated: number;
-        skipped: number;
-        failed: number;
-      }>;
+      const dbEntityProgress = importSession.entityProgress as Record<
+        string,
+        {
+          total: number;
+          processed: number;
+          percentage: number;
+          created: number;
+          updated: number;
+          skipped: number;
+          failed: number;
+        }
+      >;
       for (const [entityType, entityData] of Object.entries(dbEntityProgress)) {
         entityProgress[entityType] = {
           percentage: entityData.percentage,
