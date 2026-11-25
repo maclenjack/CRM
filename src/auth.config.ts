@@ -25,7 +25,9 @@ export const authConfig: NextAuthConfig = {
       console.log(auth);
       const isLoggedIn = !!auth?.user;
       const isPublicRoute =
-        nextUrl.pathname === '/sign-in' || nextUrl.pathname === '/register';
+        nextUrl.pathname === '/' ||
+        nextUrl.pathname === '/sign-in' ||
+        nextUrl.pathname === '/register';
 
       if (!isLoggedIn && !isPublicRoute) {
         return Response.redirect(new URL('/sign-in', nextUrl));
