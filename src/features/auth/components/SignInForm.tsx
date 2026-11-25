@@ -29,7 +29,12 @@ import { Separator } from '@/components/ui/separator';
 import { signIn } from '@/features/auth/auth.actions';
 import { signInSchema } from '@/features/auth/auth.validation';
 
-export function SignInForm() {
+interface SignInFormProps {
+  onSuccess?: () => void;
+  onSwitchToRegister?: () => void;
+}
+
+export function SignInForm({ onSuccess, onSwitchToRegister }: SignInFormProps) {
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof signInSchema>>({
@@ -48,103 +53,84 @@ export function SignInForm() {
         form.setError('root', {
           message: response.error,
         });
+      } else if (response?.success) {
+        onSuccess?.();
       }
     });
   }
 
   return (
-    <Card
-      className="
-        w-full
-        sm:max-w-md
-      "
-    >
-      <CardHeader>
-        <CardTitle className="px-4">Sign In</CardTitle>
-      </CardHeader>
-      <CardContent className="flex justify-center">
-        <form
-          id="form-sign-in"
-          onSubmit={form.handleSubmit(handleSubmit)}
-          className="
-            w-full max-w-sm space-y-4 rounded-lg border border-neutral-200
-            bg-white p-8 shadow-md
-          "
-        >
-          <FieldGroup>
-            <Controller
-              name="email"
-              control={form.control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-sign-in-email">Email</FieldLabel>
-                  <Input
-                    {...field}
-                    id="form-sign-in-email"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="john.doe@example.com"
-                    autoComplete="email"
-                    disabled={form.formState.isSubmitting}
-                    onChange={(e) => {
-                      const cleanValue = e.target.value
-                        .replace(/\s+/g, '')
-                        .replace(/[^\x20-\x7E]/g, '');
-                      field.onChange(cleanValue);
-                    }}
-                  />
-                  <FieldError errors={[fieldState.error]} />
-                </Field>
-              )}
-            />
+    <div className="w-full">
+      <form
+        id="form-sign-in"
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="w-full max-w-sm space-y-4"
+      >
+        <FieldGroup>
+          <Controller
+            name="email"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="form-sign-in-email">Email</FieldLabel>
+                <Input
+                  {...field}
+                  id="form-sign-in-email"
+                  aria-invalid={fieldState.invalid}
+                  placeholder="john.doe@example.com"
+                  autoComplete="email"
+                  disabled={form.formState.isSubmitting}
+                  onChange={(e) => {
+                    const cleanValue = e.target.value
+                      .replace(/\s+/g, '')
+                      .replace(/[^\x20-\x7E]/g, '');
+                    field.onChange(cleanValue);
+                  }}
+                />
+                <FieldError errors={[fieldState.error]} />
+              </Field>
+            )}
+          />
 
-            <PasswordField
-              form={form}
-              name="password"
-              id="form-sign-in-password"
-              label="Password"
-              autoComplete="current-password"
-            />
-          </FieldGroup>
+          <PasswordField
+            form={form}
+            name="password"
+            id="form-sign-in-password"
+            label="Password"
+            autoComplete="current-password"
+          />
+        </FieldGroup>
 
-          {form.formState.errors.root && (
-            <Alert
-              variant="destructive"
-              className="animate-in duration-200 fade-in-50"
-            >
-              <AlertCircle className="size-4" />
-              <AlertTitle>Sign In Failed</AlertTitle>
-              <AlertDescription>
-                {form.formState.errors.root.message}
-              </AlertDescription>
-            </Alert>
-          )}
+        {form.formState.errors.root && (
+          <Alert
+            variant="destructive"
+            className="animate-in duration-200 fade-in-50"
+          >
+            <AlertCircle className="size-4" />
+            <AlertTitle>Sign In Failed</AlertTitle>
+            <AlertDescription>
+              {form.formState.errors.root.message}
+            </AlertDescription>
+          </Alert>
+        )}
 
-          <Field>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? 'Signing in...' : 'Sign In'}
+        <Field>
+          <Button type="submit" disabled={isPending} className="w-full">
+            {isPending ? 'Signing in...' : 'Sign In'}
+          </Button>
+        </Field>
+        <Separator />
+        <Item>
+          <ItemContent>
+            <ItemDescription>Don&apos;t have an account?</ItemDescription>
+          </ItemContent>
+          <ItemActions>
+            <Button variant="link" onClick={onSwitchToRegister}>
+              Get Started Free
             </Button>
-          </Field>
-          <Separator />
-          <Item>
-            <ItemContent>
-              <ItemDescription>Don&apos;t have an account?</ItemDescription>
-            </ItemContent>
-            <ItemActions>
-              <Button variant="link">
-                <Link
-                  href="/register"
-                  className="
-                    text-primary
-                    hover:underline
-                  "
-                >
-                  Sign up
-                </Link>
-              </Button>
-            </ItemActions>
-          </Item>
-        </form>
-      </CardContent>
-    </Card>
+          </ItemActions>
+        </Item>
+      </form>
+    </div>
   );
 }
